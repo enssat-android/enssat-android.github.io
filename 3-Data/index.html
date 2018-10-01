@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="remark,remarkjs,markdown,slideshow,presentation" />
+    <meta name="description" content="A simple, in-browser, markdown-driven slideshow tool." />
+    <title>Android - Data</title>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Droid Serif';
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .remark-slide-content h1 { font-size: 3em; }
+      .remark-slide-content h2 { font-size: 2em; }
+      .remark-slide-content h3 { font-size: 1.6em; }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
+      li p { line-height: 1.25em; }
+      .red { color: #fa0000; }
+      .green { color: #598f05; }
+      .warning { color: #598f05; float : right;  line-height : 65px  }
+      .large { font-size: 2em; }
+      a, a > code {
+        color: rgb(249, 38, 114);
+        text-decoration: none;
+      }
+      code {
+        background: #e7e8e2;
+        border-radius: 5px;
+      }
+        
+      
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono' }
+      .remark-code-line-highlighted     { background-color: #373832 }
+      .pull-left {
+        float: left;
+        width: 47%;
+      }
+      .pull-right {
+        float: right;
+        width: 47%;
+      }
+      .pull-right ~ p {
+        clear: both;
+      }
+      #slideshow .slide .content code {
+        font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+        font-size: 0.9em;
+        padding: 15px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+        bottom: 12px;
+        left: 20px;
+      }
+      #slide-how .slides {
+        font-size: 0.9em;
+        position: absolute;
+        top:  151px;
+        right: 140px;
+      }
+      #slide-how .slides h3 {
+        margin-top: 0.2em;
+      }
+      #slide-how .slides .first, #slide-how .slides .second {
+        padding: 1px 20px;
+        height: 90px;
+        width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
+        box-shadow: 0 0 10px #777;
+      }
+      #slide-how .slides .first {
+        background: #fff;
+        position: absolute;
+        top: 20%;
+        left: 20%;
+        z-index: 1;
+      }
+      #slide-how .slides .second {
+        position: relative;
+        background: #fff;
+        z-index: 0;
+      }
+
+      /* Two-column layout */
+      .left-column {
+        width: 50%;
+        height: 92%;
+        float: left;
+      }
+      .right-column {
+        width: 50%;
+        height: 92%;
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+# Android Data
+
+ENSSAT
+2018-2019
+
+Guillaume Châtelet
+
+---
+layout:false
+## plan
+
+- Intents &amp; Action 
+- Shared Preferences
+- Fichiers
+- Base de donnée
+- Content Provider
+- Sensors 
+
+
+---
+## les Data dans Android
+
+Comment gérer les données en Android ?
+
+Différents objectifs, différents outils
+
+Objectifs:
+- Accès depuis des activités
+- Accès depuis des services 
+- Persistance
+- Rapidité d'accès
+- Données de configuration
+
+---
+template: inverse
+# Intents &amp; Action
+
+"Je voudrais envoyé un message, il y a quelqu'un qui sait faire ça ?"
+
+---
+## Intent
+
+- Contient une URI pour définir les données à afficher
+- Contient une Action : ce qu'il faut faire des données
+- Contient des Extras : (Key, Value)
+
+```
+      Intent sms = new Intent(Intent.ACTION_SENDTO, Uri.parse("sms:" + numero));
+      sms.putExtra("sms_body", corpDuSms);
+      startActivity(sms);
+```
+
+Les Extras peuvent contenir des types Java simple mais aussi des objets plus compliqués
+
+Pour lancer les activités
+
+```
+     Intent intent = new Intent(context, SecondActivity.class);
+     startActivity(intent);
+```
+
+---
+## Data en retour d'Intent
+
+Pour récupérer une donnée d'une activité que l'on a lancé
+dans le code d'une activité
+
+```java
+    void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_PHOTO);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_PHOTO && resultCode == Activity.RESULT_OK) {
+             // use data.getData() if any
+        }
+    }
+```
+
+
+---
+## Dans les faits
+
+Mettre des datas dans les Intents n'est utilisé que pour spécialiser des activités
+
+Par exemple:
+- Lancer un appel avec un numéro de téléphone
+- Activé la recherche ou pas
+- définir quelle liste afficher
+
+Passer de gros volume de donnée dans des Intents est difficile.
+
+---
+## Singleton
+
+Pour faire une interface pour gérer les donnée
+
+On peut créer des .remark-code[Singletons] pour contenir les données
+
+.remark-code[exemple de Singleton
+
+    public class MySingleton {
+
+        private static MySingleton sInstance;
+
+        public static MySingleton getInstance() {
+            if (sInstance == null) sIntance = new MySingleton();
+            return sInstance;
+        }
+
+        private MySingleton() {
+        ...
+]  
+
+<img style="float" width="10%" src="img/android-danger-sign.jpg"/>.warning[Difficile à tester, La création de l'instance peut prendre du temps]
+
+---
+template: inverse
+# Shared Preferences
+
+"Je préfère partagé"
+
+---
+## Shared Preferences
+
+Pour sauver de la configuration sur le disque
+
+Relativement simple à mettre en place
+Possibilité de générer une interface (type Settings du téléphone) pour modifier la configuration
+
+.remark-code[get a shared preference
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+             preference_file_key, Context.MODE_PRIVATE);
+        String userName = sharedPref.getString(USER_NAME);
+]
+
+.remark-code[set a shared preference
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+             preference_file_key, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(USER_NAME, userName);
+        editor.apply();
+]
+
+.green[suivant le .remark-code[Context], les shared preferences peuvent etre associé à une activité ou à l'application]
+
+
+---
+template: inverse
+# Fichiers
+
+"Linux, tout est fichier"
+
+---
+## Fichiers
+
+Android utilise la librairie .remark-code[java.io] classique pour gérer les fichiers en utilisant des objets .remark-code[File]
+
+Le .remark-code[Context] de l'application permet de récupérer les chemins suivant:
+
+- .remark-code[getFilesDir()] : le répertoire des fichiers de l'application. 
+
+       Pas accessible par l'utilisateur (sauf s'il est root)   
+
+- .remark-code[getCacheDir()] : le cache de l'application. 
+
+       Peut être vidé par l'utilisateur depuis les paramètres du terminal
+
+- .remark-code[getExternalFilesDir()] : Le répertoire des fichiers de l'application sur la sdcard. 
+
+       Tout le monde peut le lire
+
+       Nécessite les permissions READ ou WRITE_EXTERNAL_STORAGE pour l'utiliser   
+
+---
+template: inverse
+# Base de données
+
+"query, update, insert, delete"
+ 
+---
+## Base de données
+
+Android contient la librairie SQLite qui permet de gérer des base de données
+
+Un wrapper permet de créer des bases _facilement_
+
+.remark-code[SQLiteOpenHelper 
+
+    public class FeedReaderDbHelper extends SQLiteOpenHelper {
+        // If you change the database schema, you must increment the database version.
+        public static final int DATABASE_VERSION = 1;
+        public static final String DATABASE_NAME = "FeedReader.db";
+
+        public FeedReaderDbHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(SQL_CREATE_ENTRIES);
+        }
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // This database is only a cache for online data, so its upgrade policy is
+            // to simply to discard the data and start over
+            db.execSQL(SQL_DELETE_ENTRIES);
+            onCreate(db);
+        }
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            onUpgrade(db, oldVersion, newVersion);
+        }
+   }]
+
+---
+## Base de données : insertion
+
+Les ContentValues permettent d'insérer plusieurs données dans la table
+
+.remark-code[db.insert 
+
+     // Gets the data repository in write mode
+     SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+     // Create a new map of values, where column names are the keys
+     ContentValues values = new ContentValues();
+     values.put(FeedEntry.COLUMN_NAME_TITLE, title);
+     values.put(FeedEntry.COLUMN_NAME_SUBTITLE, subtitle);
+
+     // Insert the new row, returning the primary key value of the new row
+     long newRowId = db.insert(FeedEntry.TABLE_NAME, null, values);
+]
+
+On peut spécifier des politiques en cas de collision
+
+---
+## Base de données : requête
+
+Les requêtes donne des .remark-code[Cursor] qui permettent de naviguer dans les résultats  
+
+.remark-code[db.query
+
+    // Define a projection that specifies which columns from the database
+    // you will actually use after this query.
+    String[] projection = {
+        FeedEntry._ID,
+        FeedEntry.COLUMN_NAME_TITLE,
+        FeedEntry.COLUMN_NAME_SUBTITLE
+        };
+
+    // Filter results WHERE "title" = 'My Title'
+    String selection = FeedEntry.COLUMN_NAME_TITLE + " = ?";
+    String[] selectionArgs = { "My Title" };
+
+    Cursor c = db.query(
+        FeedEntry.TABLE_NAME,                     // The table to query
+        projection,                               // The columns to return
+        selection,                                // The columns for the WHERE clause
+        selectionArgs,                            // The values for the WHERE clause
+        null,                                     // don't group the rows
+        null,                                     // don't filter by row groups
+        null                                      // The sort order
+        );
+]
+
+---
+## Navigation avec les Curseurs
+
+Ne pas oublier de libérer la mémoire après avoir utiliser le .remark-code[Cursor]
+
+.remark-code[navigation
+
+     
+     if (cursor != null) {
+         int titleIndex = cursor.getColumnIndex(FeedEntry.COLUMN_NAME_TITLE);
+         for (int i=0; i<cursor.getcount(); i++) {
+             cursor.moveToPosition(i);
+             String title = cursor.getString(titleIndex);
+         }
+         cursor.close()
+     }  
+]
+
+
+---
+template: inverse
+# Content Provider
+
+"Partagé les données pour éviter des les recopier"
+
+---
+## Content Provider
+
+Les content provider permettent d'exposer vers d'autres applications les données de votre application. 
+
+Par exemple :
+- AlarmClock : alarmes enregistrées
+- Browser : essentiellement les bookmarks
+- CallLog : liste des appels
+- ContactsContract : les contacts
+- MediaStore : bibliothèque des médias
+- Settings : configuration du système
+- SyncStateContracts : synchronisation
+- UserDictionary : dictionnaire
+
+Coté client, on utilise un service du système pour accéder aux données
+
+.remark-code[contentResolver example
+
+     ContentResolver contentResolver = getContentResolver();
+     Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+     Cursor cursor = contentResolver.query(uri, null, null, null, null);
+]
+
+---
+## Coté fournisseur de contenu
+
+On doit déclarer un ContentProvider dans le Manifest
+
+Implementer le ContentProvider :
+
+- Parser les Uris 
+ - fr.enssat.myapp.mydata : toutes les données
+ - fr.enssat.myapp.mydata/ID : seulement la donnée avec l'id ID
+ - fr.enssat.myapp.mydata/text : seulemenet les données texte
+ - ...
+
+- Implementer les commandes query, insert, update, delete
+
+- Gérer la securité
+
+voir https://developer.android.com/guide/topics/providers/content-providers.html
+
+
+
+---
+template: inverse
+# Données du terminal
+
+"Parce qu'un mobile n'est pas un PC"
+
+---
+## Managers
+
+Plusieurs managers permettent d'accéder aux données du terminal
+
+- SensorManager : les données des capteurs
+- LocationManager : permet d'accèder à la localistaion du terminal
+- TelephonyManager : tout ce qui touche à la téléphonie
+- SmsMananger : permet d'envoyer des SMS
+- ClipBoardMananger : copie colle manager
+- PackageManager : applications installé sur le terminal
+- PowerManager : la batterie
+- NFCManager : le  NFC
+- BlueToothManager: le bluetooth
+- WifiManager : le Wifi
+
+
+On récupère les manager en utilisant un context:
+
+.remark-code[get manager
+
+    LocationManager mgr = 
+        (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+]
+
+---
+## Les Capteurs
+
+Toutes les données des capteurs sont remontées aux applications via des Sensors
+
+On utilise le service du système : SensorManager
+.remark-code[SensorManager 
+
+     SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+     Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+]
+
+Pricipaux type de sensor
+- TYPE_GRAVITY
+- TYPE_ACCELEROMETER
+- TYPE_LINEAR_ACCELERATION
+- TYPE_GYROSCOPE
+- TYPE_LIGHT 
+- TYPE_MAGNETIC_FIELD
+- TYPE_PRESSURE 
+- TYPE_PROXIMITY
+- ROTATION_VECTOR
+- TYPE_TEMPERATURE
+
+---
+## Utilisation des données du sensor
+
+On enregistre un listener pour recevoir les données du sensor
+
+.remark-code[Sensor
+
+     protected void onResume() {
+         super.onResume();
+         mSensorManager.registerListener(mListener, mAccelerometer, 
+              SensorManager.SENSOR_DELAY_NORMAL);
+     }
+
+     protected void onPause() {
+         super.onPause();
+         mSensorManager.unregisterListener(mListener);
+     }
+]
+
+.green[ne pas oublier de déenregistrer le listener]
+
+.remark-code[ listener
+
+     public void onSensorChanged(SensorEvent event) {
+         long when = event.timestamp;
+         float xAcc = event.values[0];
+         float yAcc = event.values[1];
+         float zAcc = event.values[2];
+     }]
+
+
+---
+## La localisation
+
+La localisation d'un terminal peut se faire de differentes façons
+- Le réseau GSM : permet la localisation du terminal en estimant la distance au antennes GSM vues par le terminal 
+ - biais car le signal peut etre atténué ou emplifié
+- Les bornes Wifi : Google connait la localisation des bornes Wifi 
+ - sauf quand elles bougent
+- Le GPS : fournie une localisation sure du terminal
+ - par satélite
+ - couteuse en énergie 
+ - amélioration du temps de localisation grace au aGPS (réseau)
+
+
+---
+## Utilisation du LocationManager
+
+
+.remark-code[LocationManager
+
+
+    // Acquire a reference to the system Location Manager
+    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+    // Define a listener that responds to location updates
+    LocationListener locationListener = new LocationListener() {
+         public void onLocationChanged(Location location) {
+         // Called when a new location is found by the network location provider.
+             makeUseOfNewLocation(location);
+         }
+
+         public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+         public void onProviderEnabled(String provider) {}
+
+         public void onProviderDisabled(String provider) {}
+    };
+
+    // Register the listener with the Location Manager to receive location updates
+    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+]
+
+---
+template: inverse
+# Données distantes
+
+"Il faut resté connecté"
+
+---
+## Requête http
+
+Android fournit une API de haut niveau pour faire des requêtes HTTP
+
+nécessite la permission .remark-code[android.permission.INTERNET] 
+
+.remark-code[HttpUrlConnection
+
+        URL url = new URL(myurl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        int response = conn.getResponseCode();
+        Log.d(DEBUG_TAG, "The response is: " + response);
+        is = conn.getInputStream();
+]
+
+indépendant de la librairie sous jacente (Apache, OkHttp depuis 6.0) 
+
+.green[Bientôt impossible de faire du http, faites du https]
+
+.green[Pas de connection internet sur le main thread, c'est synchrone !!!]
+
+---
+## Requête asynchrone avec Volley
+
+librairie externe poussée par Google
+
+ajouter .remark-code[compile 'com.android.volley:volley:1.0.19'] dans les dépendances du projet 
+
+.remark-code[Volley
+
+    RequestQueue queue = Volley.newRequestQueue(this);
+    String url ="http://www.google.com";
+
+    // Request a string response from the provided URL.
+    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+            new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                 // Display the first 500 characters of the response string.
+                 mTextView.setText("Response is: "+ response.substring(0,500));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                 mTextView.setText("That didn't work!");
+            }
+        });
+    // Add the request to the RequestQueue.
+    queue.add(stringRequest);
+]
+
+---
+## parser la réponse : exemple Json
+
+On utilise l'objet .remark-code[JSONTokener] qui nous revoit soit un .remark-code[JSONObejct] soit un .remark-code[JSONArray]
+
+.remark-code[JSONTokener exemple
+
+     String json = "{"
+         + "  \"query\": \"Pizza\", "
+         + "  \"locations\": [ 94043, 90210 ] "
+         + "}";
+
+     JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
+     String query = object.getString("query");
+     JSONArray locations = object.getJSONArray("locations");
+]
+
+---
+## parser la réponse : Gson la magie des anotations
+
+On utilise la librairie Gson 
+
+ajouter .remark-code[compile 'com.google.code.gson:gson:2.7'] dans les dépendances du projet 
+
+.remark-code[JSONTokener exemple
+
+     String json = "{"
+         + "  \"query\": \"Pizza\", "
+         + "  \"locations\": [ 94043, 90210 ] "
+         + "}";
+
+     class Data {
+
+         @SerializedName{"query"}
+         public String type
+    
+         @SerializedName("locations")
+         public int locs[];
+     }
+
+     Gson gson = new Gson();
+     Reader reader = new StringReader(json);
+     Data data = gson.fromJson(reader, Data.class);
+]
+
+
+
+---
+template: inverse
+# Merci
+
+
+
+    </textarea>
+    <script src="../download/remark-latest.min.js"></script>
+    <script>
+      var hljs = remark.highlighter.engine;
+    </script>
+    <script src="remark.language.js"></script>
+    <script>
+      var slideshow = remark.create({
+          highlightStyle: 'default',
+          highlightLanguage: 'java',
+          highlightLines: true
+        }) ;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="remark,remarkjs,markdown,slideshow,presentation" />
+    <meta name="description" content="A simple, in-browser, markdown-driven slideshow tool." />
+    <title>Android - Background</title>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Droid Serif';
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .remark-slide-content h1 { font-size: 3em; }
+      .remark-slide-content h2 { font-size: 2em; }
+      .remark-slide-content h3 { font-size: 1.6em; }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
+      li p { line-height: 1.25em; }
+      .red { color: #fa0000; }
+      .green { color: #598f05; }
+      .warning { color: #598f05; float : right;  line-height : 65px  }
+      .large { font-size: 2em; }
+      a, a > code {
+        color: rgb(249, 38, 114);
+        text-decoration: none;
+      }
+      code {
+        background: #e7e8e2;
+        border-radius: 5px;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .remark-code-line-highlighted     { background-color: #373832; }
+      .pull-left {
+        float: left;
+        width: 47%;
+      }
+      .pull-right {
+        float: right;
+        width: 47%;
+      }
+      .pull-right ~ p {
+        clear: both;
+      }
+      #slideshow .slide .content code {
+        font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+        font-size: 0.9em;
+        padding: 15px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+        bottom: 12px;
+        left: 20px;
+      }
+      #slide-how .slides {
+        font-size: 0.9em;
+        position: absolute;
+        top:  151px;
+        right: 140px;
+      }
+      #slide-how .slides h3 {
+        margin-top: 0.2em;
+      }
+      #slide-how .slides .first, #slide-how .slides .second {
+        padding: 1px 20px;
+        height: 90px;
+        width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
+        box-shadow: 0 0 10px #777;
+      }
+      #slide-how .slides .first {
+        background: #fff;
+        position: absolute;
+        top: 20%;
+        left: 20%;
+        z-index: 1;
+      }
+      #slide-how .slides .second {
+        position: relative;
+        background: #fff;
+        z-index: 0;
+      }
+
+      /* Two-column layout */
+      .left-column {
+        width: 50%;
+        height: 92%;
+        float: left;
+      }
+      .right-column {
+        width: 50%;
+        height: 92%;
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+# Android Background
+
+ENSSAT
+2018-2019
+
+Guillaume Châtelet
+
+---
+layout:false
+## plan
+
+- Threading
+- Service
+- IntentService
+- BroadcastReceiver
+
+
+---
+template: inverse
+# Threading
+
+"un thread pour les gourverner tous"
+
+---
+# Notion de thread système
+
+Le système appelle les callbacks des activités en utilisant le .remark-code[Main thread]
+
+.green[Ce thread ne doit pas être utilisé trop longtemps par le code de l'application]
+
+Il faut faire tourner les tâches longues en tâche de fond
+
+.green[il n'est pas possible de modifier l'UI si on n'est pas dans le main thread]
+
+
+
+.green[implique une communication entre les tâches de fond et le main thread]
+
+
+---
+## Thread
+
+Api standard Java
+
+.remark-code[Thread
+
+    final int loop = 5;
+    Thread t = new Thread(new Runnable() {
+
+         @Overide
+         public void run() {
+              for (int i=0; i<loop; i++) {
+                   // do incredibly long task
+                   ...
+              }
+         }
+    });
+    t.start();
+]
+
+les variables enternes doivent être finale. 
+
+l'accès aux paramètres de la classe est possible 
+
+.green[attention aux accès concurents]
+
+---
+## Handler
+
+Les Handler permettent de gérer des messsages ou d'exécuter des Runnable dans le Thread où ils ont été créer. 
+
+On peut demander un traitement immédiat ou dans le futur
+
+
+Chaque .remark-code[View] contient un .remark-code[Handler]
+
+```
+Handler handler = textView.getHandler();
+
+handler.post(new Runnable() {
+    @Overide
+    public void run() {
+         textview.setText(result); 
+    }
+}
+```
+
+On peut aussi créer un Handler dans une .remark-code[Activity], il pourra modifier l'UI.
+
+```
+class MyActivity extends Activity {
+    
+    Handler handler = new Handler();
+
+    ...
+}
+```
+
+---
+## AsyncTask
+
+Android fournit une les .remark-code[AsyncTask] pour interagir avec l'UI pendant la tâche de fond.
+
+```
+    class AsyncCreateString extends AsyncTask<Long, Integer, String> {
+
+        @Override
+        protected String doInBackground(Long... seed) {
+            String result = null;
+            // loop to create result 
+                updateProgress(progress)
+            // end loop
+            return result;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            // update UI with values[0] 
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            // update UI with the result s
+        }
+    }
+
+```
+
+
+
+---
+template: inverse
+# Service
+
+"Au service des activités"
+
+---
+## Les Services Android
+
+Les services sont des moyens d'exposer une interface à l'ensemble d'une application, voir même aux applications externes
+
+Il doivent être déclaré dans le Manifest de l'application
+
+Les services ont leur propre cycle de vie, indépendante de l'UI
+
+On les utilise: 
+- pour fournir un functionalité : par exemple, Service de voix sur IP
+
+- pour accéder à un traitement en tâche de fond : par exemple, Service qui joue de la musique, Service de navigation, Service de comptage de pas
+
+
+.green[une Service n'est pas un Thread, Les traintements long doivent se faire dans un worker Thread]
+
+
+---
+## Invoquer un service
+
+Deux manières d'invoquer un .remark-code[Service] :
+
+### à la demande
+
+L'UI s'attache au .remark-code[Service] qui se créé à la demande
+
+```
+context.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+```
+
+Quand plus aucun _client_ n'est connecté, le .remark-code[Service] s'arrête 
+
+### démarage explicite
+
+L'UI démarre le .remark-code[Service] explicitement 
+
+```
+context.startService(intent);
+```
+
+qui s'arrêtera quand l'UI appele la commande 
+
+```
+context.stopService(intent);
+```
+
+---
+## Cycle de vie d'un Service
+
+<center>
+<img src="img/service_lifecycle.png" />
+</center>
+
+
+---
+## Communication avec un Service
+
+Au moment du .remark-code[onBind], le service envoie au client un .remark-code[Binder]
+
+Le client le reçoit dans la *callback* du .remark-code[ServiceConnection] passer au moment du .remark-code[bindService]  
+
+```
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+             mService = getService(iBinder);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+             mSercive = null;
+        }
+    };
+
+```
+
+
+
+---
+## AIDL pour du _remote procedure call_
+
+**L**anguage de **D**éfinition d'une **I**nterface **A**ndroid : .green[AIDL]
+
+Il est pré-processé par le sdk Android pour créer un .remark-code[Stub] à surchargé coté service.
+
+Ce Stub est un .remark-code[Binder] qui peut être passer lors du _bind_ des clients
+  
+Il permet de faire des appels de fonctions entre différents processus Android.
+
+```
+// IMyAidlInterface.aidl
+package fr.enssat.helloenssat;
+
+// Declare any non-default types here with import statements
+
+interface IMyAidlInterface {
+    /**
+     * Demonstrates some basic types that you can use as parameters
+     * and return values in AIDL.
+     */
+    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
+            double aDouble, String aString);
+}
+```
+.green[Tous les types non basic doivent implémenté l'interface .remark-code[Parcelable]]
+
+---
+## IntentService
+
+C'est un mix entre un Service et un Thread
+
+On envoie un .remark-code[Intent] à l'.remark-code[IntentService] qui démarre un Thread pour traiter la demande
+
+```
+public class MyIntentService extends IntentService {
+
+
+    public MyIntentService() {
+        super("MyIntentServiceThread");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        // Process the Intent in the Thread  
+    }
+
+}
+``` 
+
+---
+template: inverse
+# Broadcast Receiver
+
+"On nous signal du changement"
+
+---
+## BroadcastReceiver
+
+Les .remark-code[BroadcastReceiver] permettent de recevoir des .remark-code[Intent] envoyé à l'ensemble des _receivers_.
+
+```
+public class MyBroadcastReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // Handle the Intent  
+    }
+
+}
+```
+
+.green[le callback est appelé sur le main Thread]
+
+### Broadcaster un Intent
+
+```
+context.sendBroadcast(Intent intent);
+
+context.sendOrderedBroadcast(Intent intent);
+```
+
+---
+## Enregister un BroadcastReceiver
+
+Soit dans le Manifest
+
+```
+        <receiver android:name=".MyBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+```
+
+Soit dans dynamiquement dans le code
+
+```
+    public void register(Context context) {
+        if (myBroadcastReceiver != null) 
+             throws new IllegalStateException("receiver already registered");
+        myBroadcastReceiver = new MyBroadcastReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+        context.registerReceiver(myBroadcastReceiver, filter);
+    }
+    
+    public void unregister(Context context) {
+        context.unregisterReceiver(myBroadcastReceiver);
+        myBroadcastReceiver = null;
+    }
+```
+
+
+
+
+---
+template: inverse
+# Merci
+
+
+
+    </textarea>
+    <script src="../download/remark-latest.min.js"></script>
+    <script>
+      var hljs = remark.highlighter.engine;
+    </script>
+    <script src="remark.language.js"></script>
+    <script>
+      var slideshow = remark.create({
+          highlightStyle: 'default',
+          highlightLanguage: 'java',
+          highlightLines: true
+        }) ;
+    </script>
+  </body>
+</html>

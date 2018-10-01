@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="remark,remarkjs,markdown,slideshow,presentation" />
+    <meta name="description" content="A simple, in-browser, markdown-driven slideshow tool." />
+    <title>Android - Interface Homme Machine</title>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Droid Serif';
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .remark-slide-content h1 { font-size: 3em; }
+      .remark-slide-content h2 { font-size: 2em; }
+      .remark-slide-content h3 { font-size: 1.6em; }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
+      li p { line-height: 1.25em; }
+      .red { color: #fa0000; }
+      .green { color: #598f05; }
+      .warning { color: #598f05; float : right;  line-height : 65px  }
+      .large { font-size: 2em; }
+      a, a > code {
+        color: rgb(249, 38, 114);
+        text-decoration: none;
+      }
+      code {
+        background: #e7e8e2;
+        border-radius: 5px;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .remark-code-line-highlighted     { background-color: #373832; }
+      .pull-left {
+        float: left;
+        width: 47%;
+      }
+      .pull-right {
+        float: right;
+        width: 47%;
+      }
+      .pull-right ~ p {
+        clear: both;
+      }
+      #slideshow .slide .content code {
+        font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+        font-size: 0.9em;
+        padding: 15px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+        bottom: 12px;
+        left: 20px;
+      }
+      #slide-how .slides {
+        font-size: 0.9em;
+        position: absolute;
+        top:  151px;
+        right: 140px;
+      }
+      #slide-how .slides h3 {
+        margin-top: 0.2em;
+      }
+      #slide-how .slides .first, #slide-how .slides .second {
+        padding: 1px 20px;
+        height: 90px;
+        width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
+        box-shadow: 0 0 10px #777;
+      }
+      #slide-how .slides .first {
+        background: #fff;
+        position: absolute;
+        top: 20%;
+        left: 20%;
+        z-index: 1;
+      }
+      #slide-how .slides .second {
+        position: relative;
+        background: #fff;
+        z-index: 0;
+      }
+
+      /* Two-column layout */
+      .left-column {
+        width: 50%;
+        height: 92%;
+        float: left;
+      }
+      .right-column {
+        width: 50%;
+        height: 92%;
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+# Android Interface Homme Machine
+
+ENSSAT
+2018-2019
+
+Guillaume Châtelet
+
+---
+layout:false
+## plan
+
+- Activités 
+- Layouts et Views
+- Adapter
+- Toast, SnackBar, Dialog &amp; Menus
+- IHM Avancée
+
+
+---
+template: inverse
+# Activités
+
+"Une activité par ... activité"
+
+---
+## Activité : Une page de l'application
+
+Classe java qui hérite de la classe du SDK .remark-code[Activity]
+
+Elle doit être référencée dans le Manifest de l'application
+
+ 
+### Contenu
+
+- Chaque activité décrit ce qui va être affiché dans la page : .remark-code[Layout]
+
+Bonne pratique : .green[Une seule activité par .remark-code[Activity]]
+
+- Elle décrit aussi les actions qui vont être faite quand l'utilisateur interagit avec l'interface
+
+Bonne pratique : .green[Les actions doivent être courte pour assurer une bonne fluidité de l'application]
+
+### Context
+
+Une activité est un Context. 
+
+Les Context permettent d'interagir avec le système   
+
+---
+## Principe de base
+
+### Vie et mort d'une activité
+
+- Créés par le système en utilisant les Intent
+
+.remark-code[
+Intent intent = new Intent(Context context, ReadMailActivity.class) ;
+context.startActivity(intent);]
+
+- L'interface de l'application est un empilement d'activités
+
+- Tués par l'utilisateur (Touche "Back") ou dans le code .remark-code[finish()]
+
+### le code doit réagir au demande du système
+
+Coder une activité revient à coder les actions à faire quand le système stimule l'activité. Le système va appeler des méthodes dédiées appelées ".green[Callbacks]"
+
+
+- .remark-code[onCreate()], .remark-code[onStart()], .remark-code[onResume()]  
+- .remark-code[onDestroy()], .remark-code[onStop()], .remark-code[onPause()]  
+
+---
+## Cycle de vie d'une activité
+
+### 
+
+<center>
+<img width="50%" src="img/activity_lifecycle.png" />
+</center>
+
+
+---
+## Empilement d'activité
+
+### 
+
+<center>
+<img width="50%" src="img/activity_stack.png" />
+</center> 
+
+---
+## Réactivité des activités
+
+Les callbacks sont appelés par le système, elles sont exécutés dans le thread de l'UI
+
+Aucun traitement long ne doit se faire dans ces méthodes sous peine de blocage de l'IU
+
+Quelques traitements long :
+- accès disque
+- accès réseau
+- long calcul
+- attentes actives
+
+Voir le cours sur la communication et le traitement de tache de fond pour gérer ce problème 
+
+
+---
+template: inverse
+# Layouts et Views
+
+"Des vues dans des layouts dans des layouts dans du xml"
+
+---
+## Layout : agrégation de vues et de Layouts
+
+La première chose à faire dans une activité
+
+.remark-code[Dans la callback onCreate
+
+    @Override 
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_read_mail);
+    }]
+
+
+### Un layout est une agrégation de vue et de sous-layout.
+
+Elles n'ont pas d'affichage propre
+
+Permettent de ranger leurs enfants dans un certain ordre
+
+### Développement
+
+Les layouts sont décrits en XML dans les ressources :
+
+.remark-code[src/main/res/layout/activity_read_mail.xml]
+
+
+---
+## Les layouts Android
+
+### FrameLayout
+
+- zone d'écran pour empiler des vues les une au dessus des autres
+
+### LinearLayout
+
+- zone d'écran pour empiler des vues les une à coté des autres (horizontalement ou verticalement
+
+### TableLayout et GridLayout
+
+- zone d'écran pour aligner des vues dans des tables ou des grilles (peu utilisées dans les faits)
+
+### RelativeLayout
+
+- zone d'écran pour aligner des vues les unes par rapport aux autres
+
+Bonne pratique : .green[Plus le layout est simple, plus il est rapide à afficher]
+
+---
+## Les vues Android
+
+Widgets avec un affichage et des données 
+
+Peuvent réagir aux interaction utilisateur
+
+### TextView, ImageView
+
+- affiche un text, une image
+
+### Button, CheckBox, RadioButton
+
+- avec une interaction "onClick"
+
+### EditView
+
+- dérive de TextView, mais invite l'utilisateur à rentré une chaîne de caractère
+- possibilité de spécialisé le clavier virtuel (mail, numéro de téléphone, nombre, password, ...)
+
+---
+## Attributs des Layouts et Vues
+
+.remark-code[ TexView in layout.xml
+    
+    &lt;TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/hello_world" />
+]
+
+.left-column[
+Dimension d'indépendante de la résolution 
+- .remark-code[dp] : pour les distances 
+- .remark-code[sp] : pour les tailles de police
+- .remark-code[match_parent|wrap_content] : relatives
+
+Visibilité : .remark-code[android:visibility] 
+
+- .remark-code[visible|invisible|gone]
+
+Background : .remark-code[android:background] 
+- Drawable : .remark-code["@drawable/background"]
+- couleur : .remark-code["@color/bg_01"|"#FF0000"]
+]
+
+.right-column[
+Gravité :
+- .remark-code[android:gravity] : dans la zone d'affichage
+- .remark-code[android:layout_gravity] : dans le parent
+
+Espaces :
+- .remark-code[android:margin] : dans la zone d'affichage
+- .remark-code[android:padding] : dans le parent
+]
+
+---
+## Layouts et Vues dans le code
+
+Les fichiers .remark-code[layout.xml] sont analysés par le .remark-code[LayoutInflater] qui transforme le XML en objet java
+
+Dans le code, on peut :
+
+- retrouver les objets java créés
+- modifier dynamiquement des attributs en utilisant les objet Java
+- enregistrer des callback pour les actions utilisateurs 
+
+
+.remark-code[Exemple :
+
+    helloText = (TextView) findViewById(R.id.text);
+    button = (Button) findViewById(R.id.button);
+    button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                helloText.setText("button clicked");
+            }
+        });
+]
+---
+template: inverse
+# Adapter
+
+"Adapter une liste de donnée en une liste de vue"
+
+---
+## ListView pour afficher des listes
+
+Les listView sont des vues pour afficher des listes de données
+
+Nécessite un .remark-code[Adapter] chargé de :
+- créer des vues pour les items de la liste
+- remplir les vues avec les données pour chaque item
+
+Seulement les items affichés ont des vues
+
+Le SDK permet de recycler les vues qui ne sont plus affichées
+
+.remark-code[ exemple :
+
+        ListView listView = (ListView) findViewById(R.id.list);
+        listView.setAdapter(adapter);]
+
+---
+## Code de l'Adapter
+.remark-code[ exemple :
+
+    BaseAdapter adapter = new BaseAdapter() {
+
+        @Override public int getCount() { return list.length; }
+
+        @Override public Object getItem(int i) { return list[i]; }
+
+        @Override public long getItemId(int i) { return 0; }
+
+        @Override
+        public View getView(int position, View viewToRecycle, ViewGroup viewGroup) {
+            View itemView = viewtoRecycle;
+            if (itemView == null)
+                 itemView = View.inflate(context, android.R.layout.simple_list_item_1, null);
+
+            TextView text = (TextView) itemView.findViewById(android.R.id.text1);
+            text.setText((String) getItem(position));
+
+            return itemView;
+        }
+    };]
+
+
+---
+## RecyclerView
+
+Même système d'.remark-code[Adapter] que pour la .remark-code[ListView].
+
+Différents arrangements des views est possible :
+- Linéaire horizontal ou vertical
+- En grille aligné ou en quinconce
+
+Réarangement des items est possible
+
+Des actions comme "slide to delete" ou "slide to archive" 
+
+L'animation des views est prévue aussi
+
+.remark-code[ exemple :
+
+       @Override
+       public void onBindViewHolder(CustomViewHolder holder, int position) {
+         // Find out the data, based on this view holder's position
+         String thisItemsName = myNameList.get(position);
+         holder.nameTextView.setText(thisItemsName);
+       }]
+
+
+---
+template: inverse
+# Toasts, SnackBars, Dialogs &amp; Menus
+
+"Breakfast time"
+
+---
+## Toasts
+
+.remark-code[afficher un Toast :
+
+       String text = "Message seved as draft";  
+       Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+       toast.show();]
+
+# 
+
+<center>
+<img width="50%" src="img/toast.png" />
+<center/>
+
+---
+## SnackBar
+
+.remark-code[afficher une SnackBar :
+
+      String text = "Archived";
+      Snackbar snackbar = Snackbar
+        .make(findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG);
+        .setAction("UNDO", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               /* TODO undo last action */
+            }
+        });
+      snackbar.show();]
+
+
+<center>
+<img width="50%" src="img/snackbar-undo.png" />
+<center/>
+
+---
+## Dialogs
+
+.remark-code[afficher un Dialog :
+
+        DialogInterface.OnClickListener listener = new DialogInterface () {
+            public void onClick(DialogInterface dialog, int id) {
+                /* TODO handle click id = POSITIVE | NEGATIVE | NEUTRAL */  
+            } 
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.dialog)
+               .setPositiveButton(R.string.fire, listener)
+               .setNegativeButton(R.string.cancel, listener);
+        // Create the AlertDialog object and return it
+        Dialog dialog = builder.create();
+        dialog.show();]
+
+### 
+
+<center>
+<img src="img/dialog_buttons.png" />
+<center/>
+
+---
+## Menus
+
+.remark-code[définition dans menu.xml
+
+    &lt;?xml version="1.0" encoding="utf-8"?>
+    &lt;menu xmlns:android="http://schemas.android.com/apk/res/android">
+       &lt;item android:id="@+id/new_game"
+          android:icon="@drawable/ic_new_game"
+          android:title="@string/new_game"
+          android:showAsAction="ifRoom"/>
+       &lt;item android:id="@+id/help"
+          android:icon="@drawable/ic_help"
+          android:title="@string/help" />
+    &lt;</menu>]
+
+### 
+
+<center>
+<img src="img/actionbar.png" />
+<center/>
+
+---
+## Menus : Callbacks
+
+.remark-code[Callback de création
+   
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.game_menu, menu);
+        return true;
+    }]
+
+.remark-code[Callback de sélection
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.new_game:
+                newGame();
+                return true;
+            case R.id.help:
+                showHelp();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }]
+
+
+---
+template: inverse
+# IHM Avancée
+
+"Quand le design se lache"
+
+---
+## Fragment
+
+Les fragments sont apparus avec le support des tablettes.
+
+Ils permettent de découper les activités
+
+Ils ont leur propre cycle de vie.
+
+### Réutilisation de code dans différentes activités
+
+<center>
+<img src="img/fragments.png" />   
+</center>
+
+
+
+---
+## Coder une vue
+
+Dans certains cas (assez rares), il est nécessaire de créer une vue à la main
+
+Étendre la classe .remark-code[View]
+
+- Implémenter la méthode .remark-code[void onDraw(Canvas canvas)]
+
+ - l'objet Canvas permet de dessiner sur l'écran 
+ - L'objet Paint permet de changer le pinceau
+
+   La méthode .remark-code[onDraw] est appelé par le système après un .remark-code[invalidate]
+
+- Implémenter les méthodes :
+
+ - .remark-code[void onLayout(boolean changed, int left, int top, int right, int bottom)]
+
+ - .remark-code[void onMeasure(int widthMeasureSpec, int heightMeasureSpec)]
+
+   appelés par le .remark-code[LayoutInflater] : négociation de la longueur et largeur
+ 
+### Peut être utilisé dans un Layout
+
+---
+## Pour les jeux
+
+### SurfaceView
+
+Nécessité de gérer la cadence d'affichage : Frames par seconde 
+
+Les objet .remark-code[SurfaceView] contient un .remark-code[SurfaceHolder] propriétaire d'un .remark-code[Canvas]
+
+On doit coder le .remark-code[Thread] qui va faire les opérations suivantes :
+- bloquer le Canvas
+- dessiner la nouvelle frame dans le Canvas
+- attendre (éventuellement)
+- débloquer le Canvas (pour affichage sur l'écran)
+
+### Touch screen
+
+Il est parfois nécéssaire de gérer le touch screen à la main
+
+Surcharge de .remark-code[onTouchEvent] qui recoit des .remark-code[MotionEvent]
+
+.green[Android est multi touch...]
+ 
+
+
+
+
+
+
+
+---
+template: inverse
+# Merci
+
+
+
+    </textarea>
+    <script src="../download/remark-latest.min.js"></script>
+    <script>
+      var hljs = remark.highlighter.engine;
+    </script>
+    <script src="remark.language.js"></script>
+    <script>
+      var slideshow = remark.create({
+          highlightStyle: 'default',
+          highlightLanguage: 'java',
+          highlightLines: true
+        }) ;
+    </script>
+  </body>
+</html>

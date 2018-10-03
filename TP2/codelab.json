@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "source": "../studio/SecondApp/codelabs/tp2.md",
+  "format": "html",
+  "prefix": "../../",
+  "mainga": "UA-49880327-14",
+  "updated": "2018-10-03T22:01:31+02:00",
+  "id": "TP2",
+  "duration": 5,
+  "title": "Dialog, Toast, SnackBar, Menu",
+  "author": "Guillaume Chatelet",
+  "summary": "TP2 ENSSAT Android",
+  "theme": "",
+  "status": [
+    "draft"
+  ],
+  "category": [
+    "training"
+  ],
+  "tags": [
+    "android"
+  ],
+  "feedback": "enssat-android.github.io",
+  "ga": "0",
+  "url": "TP2"
+}

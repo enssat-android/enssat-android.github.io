@@ -12,3 +12,7 @@
 ### TP1
 
 [Build Your First Android App in Java](https://codelabs.developers.google.com/codelabs/build-your-first-android-app)
+
+### TP2
+
+[Dialog, Toast, Snackbar, Menu](https://enssat-android.github.io/TP2)

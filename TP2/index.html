@@ -1,0 +1,245 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Dialog, Toast, SnackBar, Menu</title>
+  <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../elements/codelab.html">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <style is="custom-style">
+    body {
+      font-family: "Roboto",sans-serif;
+      background: var(--google-codelab-background, #F8F9FA);
+    }
+  </style>
+  
+</head>
+<body unresolved class="fullbleed">
+
+  <google-codelab title="Dialog, Toast, SnackBar, Menu"
+                  environment="web"
+                  feedback-link="enssat-android.github.io">
+    
+      <google-codelab-step label="Introduction" duration="1">
+        <p>In this Codelabs, you will learn to create:</p>
+<ul>
+<li>Dialog</li>
+<li>Toast</li>
+<li>SnackBar</li>
+<li>Menu</li>
+</ul>
+<p>This codeLabs is based on the <a href="https://codelabs.developers.google.com/codelabs/build-your-first-android-app/index.html" target="_blank">My First Android App in Java</a> CodeLabs. It is recommanded to finish the previous CodeLabs before starting this one.</p>
+<aside class="special"><p>The code of the first codelabs is available on github in the enssat-android repository See https://github.com/enssat-android/tp2</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Dialog" duration="1">
+        <p>In this section, you will learn how to create a dialog using the <a href="https://developer.android.com/reference/android/app/AlertDialog" target="_blank">AlertDialog</a> android class.</p>
+<p>We will replace the Toast button by a Reset button. When clicked this button will present to the user a &#34;Are you sure you want to reset the counter ?&#34; &#34;Reset&#34; &#34;Cancel&#34; dialog</p>
+<h2>Change the UI</h2>
+<p>Update the layout so the &#34;Toast&#34; button become a &#34;Reset&#34; button</p>
+<ul>
+<li><code>Shift+F6</code> shortcut allow you to change the name of the variable everywhere it&#39;s used</li>
+<li>Mouse right click -&gt; Refactor -&gt; Rename will do the same</li>
+</ul>
+<p>You have to change:</p>
+<ul>
+<li>the button id</li>
+<li>the text</li>
+<li>the name of the onCLick method</li>
+</ul>
+<h2>Create a AlertDialog</h2>
+<p><a href="https://developer.android.com/reference/android/app/AlertDialog" target="_blank">AlertDialog</a> is created using a <a href="https://developer.android.com/reference/android/app/AlertDialog.Builder" target="_blank">Builder</a> class.</p>
+<p>It&#39;s a common pattern in Android and Java to create new complex object.</p>
+<p>Builder have different methods that allows to set different values that will be passed to the Object when the <code>.create()</code> method is called.</p>
+<p>All the setter methods return the instance of the builder so it&#39;s possible to call them one after one like in the following example.</p>
+<pre><code>        AlertDialog resetDialog = new AlertDialog.Builder(context)
+                .setTitle(R.string.reset_dialog_title)
+                .create();
+</code></pre>
+<p>The Builder needs a pointer to the <code>Context</code> where it will be displayed. Each activity is a context, so passing the <code>this</code> in argument will do the job.</p>
+<h2>Create a Dialog</h2>
+<p>Your work is to update the code to display the following pop up when the user click on the &#34;Reset&#34; button.</p>
+<p><img alt="drawing" style="max-width: 320.00px" src="img/fd5d023d7a1d8cb5.png"></p>
+<aside class="special"><p>When calling the <code>setNegativeButton</code> and <code>setPositiveButton</code> a OnClickListener will be needed, just put null is enought, we will do it later</p>
+</aside>
+<h2>Implement the callBack</h2>
+<p>When the positive button will be clicked, the counter should set to <code>0</code> and the UI should be updated</p>
+<p>You need to implement &#34;OnClickListener&#34; but first, you need to improve a bit the code.</p>
+<h3> Add a model class</h3>
+<p>So far, the counter value is stored in the TextView as CharSequence which NOT at all a good practice.</p>
+<p>Create a class &#34;Counter&#34; in the package <code>counter</code> that will store the int value and implements the method we need:</p>
+<ul>
+<li>a get method</li>
+<li>a increment method</li>
+<li>a reset method</li>
+</ul>
+<p>Then update the code of the <code>MainActivity</code> to use this class</p>
+<h3>OnClickListener</h3>
+<p>The <code>setPositiveButton</code> need an <code>OnClickListener</code> that declare a callback that will be called when the user is click on the button</p>
+<p>There is a old fashion way to do that. Java 1.7 do not allow the use of lambda expressions. So you need to declare a new instance of the <code>OnClickListener</code> class just to pass the onClick method to the Dialog Builder.</p>
+<pre><code>                .setPositiveButton(R.string.reset_dialog_positive, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        resetCounter();
+                    }
+                })
+</code></pre>
+<p>Java 1.8 allow you to pass to the method a lambda. But you need to use Java 1.8 to modify your gradle file to explain to the build script that it need to compile Java 1.8 code</p>
+<p>In your app/build.gradle you have to add the following lines</p>
+<pre><code>    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+</code></pre>
+<p>in the android section</p>
+<pre><code>android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId &#34;fr.enssat.firstapp&#34;
+        minSdkVersion 27
+        targetSdkVersion 28
+        versionCode 1
+        versionName &#34;1.0&#34;
+        testInstrumentationRunner &#34;android.support.test.runner.AndroidJUnitRunner&#34;
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile(&#39;proguard-android.txt&#39;), &#39;proguard-rules.pro&#39;
+        }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+}
+
+</code></pre>
+<p>This will allow you to write the following code to path the callback to the Dialog Builder</p>
+<pre><code>                .setPositiveButton(R.string.reset_dialog_positive, (dialogInterface, i) -&gt; resetCounter())
+</code></pre>
+<p>which remove a lot of bowler-plate lines of code</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Toast" duration="1">
+        <p>We already seen a Toast in the previous CodeLabs</p>
+<p><a href="https://developer.android.com/reference/android/widget/Toast" target="_blank">Toast</a> are not used a lot in todays UI as SnackBar are more gnerealy used.</p>
+<p>Any way, it may be usefull to display simple messages like &#34;It&#39;s done&#34; or &#34;Not yet implemented&#34; during the development process</p>
+<p>Toast are simple and fast to implement.</p>
+<h2>Display a Toast</h2>
+<p>Add a toast in the <code>resetCounter</code> method when the counter is already reseted and the user tries to reset it.</p>
+<aside class="special"><p>add a <code>isReseted</code> method in the Counter class may be a good idea</p>
+</aside>
+<p>The system will take care of displaying the Toast. Just a single Toast is displayed at any time. Following Toast will be displayed after the display of the current Toast.</p>
+<p>You can try to display several Toast when the counter is reseted to demonstrate that.</p>
+<aside class="warning"><p>Take care do not display Toast in loop, it may last for a very long time on the user display. This generaly leads to a 1 star rating on the store and a potentialy rude comment.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SnackBar" duration="1">
+        <p>Todays <a href="https://developer.android.com/reference/android/support/design/widget/Snackbar" target="_blank">SnackBar</a> is much more popular than the Toast.</p>
+<p>It allows to add an action button to light display and in most of the case, it&#39;s a &#34;Undo&#34; feature. This a great feature for the user but a quite hard feature to develop.</p>
+<p>Let&#39;s try to remplace our Dialog and Toast UI by a SnackBar way of doing it.</p>
+<p>Press on reset will reset the counter right away if the counter is not reseted, displaying a Snackbar that allow the user to undo the reset.<br>Press on reset on a reseted counter will display an &#34;Already done snackBar.</p>
+<h2>Displaying a SnackBar</h2>
+<p>Make sure the Snackbar package is in your <code>build.gradle</code> file.</p>
+<p>Have a look to the SnackBar Api and try to do it by yourself. It is not so different than what we arleady seen with Toast and Dialog.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Menu" duration="1">
+        <p>In a menu, you can provide feature that are not use often but maybe usefull.</p>
+<p>In this section, we will allow the user to save a counter and restore it later.</p>
+<p>To implement a menu you will need to implement two methods. First the menu constructor, where you will define the items<br>of the menu. Then a the listener for user actions, where you define the actions for each items according to the current<br>state of the applicaiton.</p>
+<h2>Creating a Menu</h2>
+<p>The method of the Activity to override is <code>onCreateOptionMenu</code></p>
+<pre><code>    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+</code></pre>
+<p>This callback will be called by the system with a Menu object in argument. The creation of the menu consists in adding <code>MenuItem</code>s<br>in this Menu object.</p>
+<h3>By hand</h3>
+<p>You can do it by hand, if you need to. Observe the Api of Menu and MenutItem.<br>You obtain a MenuItem by adding a id to the Menu. Once you get the MenuItem you can set a title, icon, etc.</p>
+<p>The other way to create a menu is to use the MenuInfalter.</p>
+<p>An Inflater is a tool that takes a Xml reference (layout, menu) and create the Java object by reflection. For instance, when we provide the <code>R.layout.activity_main</code><br>to the <code>setContent</code> method, it use the LayoutInflater to create all the object of the layout and add it to the main Window.</p>
+<p>We will do the same for a Menu</p>
+<h3>Inflate a Menu</h3>
+<p>In the onCreateOptionMenu add the following line of code</p>
+<pre><code>        getMenuInflater().inflate(R.menu.main_menu, menu);
+</code></pre>
+<p>Studio will complain that there is no resource <code>main_menu</code> in the project. <code>Alt+Enter</code> will provide you a way to create it.</p>
+<p>The resource is a main resource and should be placed in the <code>menu</code> directory of the res directory.</p>
+<p>Once created you should have something like that:</p>
+<pre><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;
+&lt;menu xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&gt;
+
+&lt;/menu&gt;
+</code></pre>
+<p>You can now add  XML tags inside the menu, each item tag should have at least the following attributes:</p>
+<ul>
+<li>id : like view id in layout resource</li>
+<li>title : the text to be displayed</li>
+<li>showAsAction : hability of the item to be displayed as icon in the ActionBar</li>
+</ul>
+<p>Items that can be shown in the ActionBar should also declare a icon. You can find Android menu icon<br>this way <code>android:icon=&#34;@android:drawable/ic_menu_save&#34;</code></p>
+<p>Create a &#34;Save&#34; and &#34;Restore&#34; menu item with id respectively <code>save_menu</code> and <code>restore_menu</code> id.</p>
+<h2>Handling user action</h2>
+<p>The <code>onOptionsItemSelected</code> is called by the system with the MenuItem object clicked by the user.<br>Using the <code>getItemId</code> method, retreive the id of the item. use a <code>switch case</code> to do the action.</p>
+<p>Implement the save and restore menu</p>
+<aside class="special"><p>Store the counter in a variable, you will learn to store on disk later</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Well Done !!!" duration="0">
+        <p>This is the end</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49880327-14', 'auto');
+
+    (function() {
+      var gaCodelab = '0';
+      if (gaCodelab) {
+        ga('create', gaCodelab, 'auto', {name: 'codelab'});
+      }
+
+      var gaView;
+      var parts = location.search.substring(1).split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var param = parts[i].split('=');
+        if (param[0] === 'viewga') {
+          gaView = param[1];
+          break;
+        }
+      }
+      if (gaView && gaView !== gaCodelab) {
+        ga('create', gaView, 'auto', {name: 'view'});
+      }
+    })();
+  </script>
+
+</body>
+</html>

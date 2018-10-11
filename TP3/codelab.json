@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "source": "../studio/ThirdApp/codelabs/tp3.md",
+  "format": "html",
+  "prefix": "../../",
+  "mainga": "UA-49880327-14",
+  "updated": "2018-10-10T21:19:01+02:00",
+  "id": "TP3",
+  "duration": 2,
+  "title": "Advanced IHM",
+  "author": "Guillaume Chatelet",
+  "summary": "TP3 ENSSAT Android",
+  "theme": "",
+  "status": [
+    "draft"
+  ],
+  "category": [
+    "training"
+  ],
+  "tags": [
+    "android"
+  ],
+  "feedback": "enssat-android.github.io",
+  "ga": "0",
+  "url": "TP3"
+}

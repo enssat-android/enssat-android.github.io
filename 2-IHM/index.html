@@ -362,80 +362,6 @@ Dans le code, on peut :
             }
         });
 ]
----
-template: inverse
-# Adapter
-
-"Adapter une liste de donnée en une liste de vue"
-
----
-## ListView pour afficher des listes
-
-Les listView sont des vues pour afficher des listes de données
-
-Nécessite un .remark-code[Adapter] chargé de :
-- créer des vues pour les items de la liste
-- remplir les vues avec les données pour chaque item
-
-Seulement les items affichés ont des vues
-
-Le SDK permet de recycler les vues qui ne sont plus affichées
-
-.remark-code[ exemple :
-
-        ListView listView = (ListView) findViewById(R.id.list);
-        listView.setAdapter(adapter);]
-
----
-## Code de l'Adapter
-.remark-code[ exemple :
-
-    BaseAdapter adapter = new BaseAdapter() {
-
-        @Override public int getCount() { return list.length; }
-
-        @Override public Object getItem(int i) { return list[i]; }
-
-        @Override public long getItemId(int i) { return 0; }
-
-        @Override
-        public View getView(int position, View viewToRecycle, ViewGroup viewGroup) {
-            View itemView = viewtoRecycle;
-            if (itemView == null)
-                 itemView = View.inflate(context, android.R.layout.simple_list_item_1, null);
-
-            TextView text = (TextView) itemView.findViewById(android.R.id.text1);
-            text.setText((String) getItem(position));
-
-            return itemView;
-        }
-    };]
-
-
----
-## RecyclerView
-
-Même système d'.remark-code[Adapter] que pour la .remark-code[ListView].
-
-Différents arrangements des views est possible :
-- Linéaire horizontal ou vertical
-- En grille aligné ou en quinconce
-
-Réarangement des items est possible
-
-Des actions comme "slide to delete" ou "slide to archive" 
-
-L'animation des views est prévue aussi
-
-.remark-code[ exemple :
-
-       @Override
-       public void onBindViewHolder(CustomViewHolder holder, int position) {
-         // Find out the data, based on this view holder's position
-         String thisItemsName = myNameList.get(position);
-         holder.nameTextView.setText(thisItemsName);
-       }]
-
 
 ---
 template: inverse
@@ -558,18 +484,156 @@ template: inverse
 
 ---
 template: inverse
-# IHM Avancée
+# Adapter
 
-"Quand le design se lache"
+"Adapter une liste de donnée en une liste de vue"
+
+---
+## ListView pour afficher des listes
+
+Les listView sont des vues pour afficher des listes de données
+
+Nécessite un .remark-code[Adapter] chargé de :
+- créer des vues pour les items de la liste
+- remplir les vues avec les données pour chaque item
+
+Seulement les items affichés ont des vues
+
+Le SDK permet de recycler les vues qui ne sont plus affichées
+
+.remark-code[ exemple :
+
+        ListView listView = (ListView) findViewById(R.id.list);
+        listView.setAdapter(adapter);]
+
+---
+## Code de l'Adapter
+.remark-code[ exemple :
+
+    BaseAdapter adapter = new BaseAdapter() {
+
+        @Override public int getCount() { return list.length; }
+
+        @Override public Object getItem(int i) { return list[i]; }
+
+        @Override public long getItemId(int i) { return 0; }
+
+        @Override
+        public View getView(int position, View viewToRecycle, ViewGroup viewGroup) {
+            View itemView = viewtoRecycle;
+            if (itemView == null)
+                 itemView = View.inflate(context, android.R.layout.simple_list_item_1, null);
+
+            TextView text = (TextView) itemView.findViewById(android.R.id.text1);
+            text.setText((String) getItem(position));
+
+            return itemView;
+        }
+    };]
+
+
+---
+## RecyclerView
+
+Même système d'.remark-code[Adapter] que pour la .remark-code[ListView].
+
+Différents arrangements des views est possible :
+- Linéaire horizontal ou vertical
+- En grille aligné ou en quinconce
+
+Réarangement des items est possible
+
+Des actions comme "slide to delete" ou "slide to archive" 
+
+L'animation des views est prévue aussi
+
+.remark-code[ exemple :
+
+       @Override
+       public void onBindViewHolder(CustomViewHolder holder, int position) {
+         // Find out the data, based on this view holder's position
+         String thisItemsName = myNameList.get(position);
+         holder.nameTextView.setText(thisItemsName);
+       }]
+
+
+---
+template: inverse
+# Data Binding / LiveData / ViewModel
+
+"JetPack your app"
+
+---
+## Data Binding
+
+Possiblité d'associer des datas directement dans le XML
+
+Possiblité de récupérer les pointeurs sur les objets créé par un Layout dans une classe auto-générée
+
+.remark-code[ Binding :
+
+      @Override
+      protected void onCreate(Bundle savedInstanceState) {
+          super.onCreate(savedInstanceState);
+          ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+          User user = new User("Test", "User");
+          binding.setUser(user);
+      }]
+
+.remark-code[ Layout :
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{user.firstName}" />
+]
+
+---
+## LiveData
+
+LiveData encapsule une donnée
+
+On peut enregistrer des obeserveurs qui sont appelé quand la donnée est modifiée
+
+.remark-code[ myLiveData.postValue(value);]
+
+.remark-code[ myLiveData.getValue(value);]
+
+.remark-code[ myLiveData.observe(component, callBack);]
+
+les callbacks ne sont enregistré que pour la durée de vie des conposants associés pour éviter les mémory leaks
+
+
+---
+## ViewModel
+
+.left-column[
+les ViewModel permettent de stocker les données pour l'affichage d'une UI
+
+les ViewModel sont créés pour la durée de vie des composants qui les demande (en excluant les reset des activités pour passage de portrait à paysage)
+
+Très utile pour séparer définitivement l'UI des données
+]
+
+.right-column[
+<img src="img/view-model.png" />
+]
+
+
+
+---
+template: inverse
+# Morceau d'IHM
+
+"Quand le design se lache, une seule solution, découper pour mieux reigner"
 
 ---
 ## Fragment
 
 Les fragments sont apparus avec le support des tablettes.
 
-Ils permettent de découper les activités
+Ils permettent de découper les activités. Aussi utilisé pour afficher des morceaux de l'IHM.
 
-Ils ont leur propre cycle de vie.
+Ils ont leur propre cycle de vie. 
 
 ### Réutilisation de code dans différentes activités
 
@@ -578,9 +642,22 @@ Ils ont leur propre cycle de vie.
 </center>
 
 
+---
+## Une super View
+
+Parfois, il est utile de créer une classe pour gérer une partie d'un Layout
+
+La classe est une extension d'un Layout (Linear, Constraint)
+
+- Soit on l'utilise dans le XML
+- Soit on inflate un layout XML dans le code
+
+Ensuite la classe et le code est réutilisable dans d'autres layout et on mutualise le code 
+
+  
 
 ---
-## Coder une vue
+## Coder une vue à la main
 
 Dans certains cas (assez rares), il est nécessaire de créer une vue à la main
 
@@ -628,6 +705,97 @@ Surcharge de .remark-code[onTouchEvent] qui recoit des .remark-code[MotionEvent]
  
 
 
+---
+template: inverse
+# Accessibilité
+
+"Coder des applications pour tous"
+
+---
+## Accesibilité pour qui ?
+
+Vous connaissez sûrement quelqu'un qui rencontre les difficultés suivante:
+* Problème de vue (Myopie)
+* Dyschromatopsie (Daltonisme)
+* Cécisté (complète ou partielle)
+* Paralysie
+
+### Il faut penser aussi à eux quand on développe
+
+Des outils sont disponibles dans Android 
+
+voir Settings d'accessibilité
+
+* Augmentation de la taille des fontes
+* Recommendations design
+* Navigation à la voix : TalkBack
+* Navigation au clavier ou au Joystick
+
+
+---
+## Augmentation de la taille des fontes
+
+### 
+
+<center>
+<img src="img/police-default.png" height="400px"/>     <img src="img/police-extra-large.png" height="400px"/>   
+</center>
+
+---
+## Recommendations design
+
+* Taille des buttons : suffisament large pour clicker sans toucher les autres boutons
+* Contraste : Evitez le gris clair sur blanc, ou rouge sur vert 
+* Information visuelle : Eviter les informations de couleur pure
+
+<center>
+<img src="img/accessibilite-1.jpg" height="400px"/>     <img src="img/accessibilite-2.jpg" height="400px"/>   
+</center>
+
+---
+## Recommendations design
+
+* Taille des buttons : suffisament large pour clicker sans toucher les autres boutons
+* Contraste : Evitez le gris clair sur blanc, ou rouge sur vert 
+* Information visuelle : Eviter les informations de couleur pure
+
+<center>
+<img src="img/accessibilite-3.jpg" height="400px"/>   
+</center>
+
+---
+## Navigation à la voix
+
+### Talkback
+
+* Vocalistion des views
+* Navigation à l'aveugle : 
+  - click to speech 
+  - double click press
+  - slide un doigt : next element / previous element
+  - slide deux doigts : next page / previous page
+
+
+### Code
+
+* Rajouter des description aux images
+* Vocaliser UI complèxe : exemple CallLog "Appel de machin à tel heure, Action rappeler"
+* La navigation doit être propre : passage de focus 
+     
+---
+## Navigation au joystick
+
+### La navigation doit être propre : passage de focus
+
+* information pertinante seulement
+
+* pas de navigation interminable
+
+* pas de navigation en boucle
+
+### Attention aux fragments
+
+même caché, ils sont là
 
 
 

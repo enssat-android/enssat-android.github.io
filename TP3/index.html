@@ -64,25 +64,195 @@
 <aside class="special"><p>You can launch a single activity while debuging. Add <code>android:exported=&#34;true&#34;</code> attribute in the manifest for this activity. Click right on the activity name in the &#34;Project&#34; view and click on the &#34;Run&#34; button.</p>
 </aside>
 <h2>Create an adapter</h2>
-<p>A <code>RecyclerView</code> needs a <code>RecyclerView.Adapter</code> class that will adpat the data into <code>RecyclerView.ViewHolder</code>.</p>
-<p>Only the <code>ViewHolder</code> needed to fill a page will be created, the <code>ViewHolder</code> out of the screen will be reused to display the next data.</p>
-<p>Then the <code>Adapter</code> have to implement the two methods:</p>
+<p>To display a list of data in a <code>ListView</code> or a <code>RecyclerView</code>, you need to give to the view an adapter.</p>
+<p>This class is in charge of:</p>
 <ul>
-<li><code>onCreateViewHolder</code><br>This method inflate the View and pass it to the <code>ViewHolder</code> before returning it.</li>
-<li><code>onBindViewHolder</code><br>This method bind the data to the <code>ViewHolder</code></li>
+<li>Create the view that will display the items of the list</li>
+<li>According to the position in the list requested, update the view of a particular item.</li>
 </ul>
-<p>You need to create a <code>SavedCounterViewHolder</code> that will contains the view. Add a &#34;field&#34; to this view holder that point to the<br><code>Button</code> of the layout.</p>
-<p>Create also a layout <code>list_item_saved_counter</code> with a single button that will display the counter value (You can reuse the TextView of the main activity).</p>
-<p>Create the <code>SavedCountersAdpater</code> which will extends <code>RecyclerView.Adapter&lt;SavedCounterViewHolder&gt;</code> and fill the methods.</p>
-<h2>Set up the RecyclerView in the Activity</h2>
-<p>In the <code>SavedActivity</code>, you need to get the <code>RecyclerView</code> object using the <code>findById</code> method.</p>
-<p>Setup the <code>RecyclerView</code> to use the <code>Adapter</code>. Choose a 2 column layout (but you can play with other layout type).</p>
-<p>At the end of it you should have something like that:</p>
+<h3> Create the adapter class</h3>
+<p>A <code>RecyclerView</code> adpater have to extends a <code>RecyclerView.Adapter</code> class.</p>
+<p>This <code>Adpater</code> class is generic, this means that it let&#39;s you choose which type of object it will work with.</p>
+<p>Let&#39;s try it:</p>
+<pre><code>public class SavedCountersAdapter extends RecyclerView.Adapter {
+}
+</code></pre>
+<p>Android will complain that the class must implements 3 methods. Alt+Enter will create it for you.</p>
+<p>The Adapter class is abstract and will force you implement the 3 followings methods</p>
+<ul>
+<li><code>getItemCount</code><br>This method gives to the <code>RecyclerView</code> the number of item to display</li>
+<li><code>onCreateViewHolder</code><br>This method gives to the <code>RecyclerView</code> the way to create a item view</li>
+<li><code>onBindViewHolder</code><br>This method gives to the <code>RecyclerView</code> the way to set the n-th element of the data to display in an item view</li>
+</ul>
+<h3>Give to the adpater the data to display</h3>
+<p>Add a <code>private List&lt;Integer&gt; mSaved</code> field to your <code>SavedCountersAdapter</code>.</p>
+<p>You have to initialize that data, you can either:</p>
+<ul>
+<li>Pass the list as an argument of the constructor</li>
+<li>Get the list of directly from the singleton <code>SavedCounters.getInstance().getAll()</code></li>
+</ul>
+<p>Now you can fill the code of the first method:</p>
+<pre><code>    @Override
+    public int getItemCount() {
+        return mSaved.size();
+    }
+</code></pre>
+<h3> Create a view for a single item</h3>
+<p>In the second method you have to create a view for one item of the list and create a <code>ViewHolder</code> object to be returned to the RecyclerView.</p>
+<p><code>public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewtype)</code></p>
+<p>Let&#39;s start by creating a ViewHolder and return it.</p>
+<p>But this class is abstract, so you need to create another class <code>CounterViewholder</code> that inherit of it.</p>
+<p>You can create it in the code of the adpater.</p>
+<pre><code>    private static class CounterViewHolder extends RecyclerView.ViewHolder {
+
+        public CounterViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+    }
+</code></pre>
+<p>Notes that the only constructor of a <code>ViewHolder</code> takes a View in argument. This is the item view we need to create.</p>
+<p>In a first time, let&#39;s give it <code>TextView</code></p>
+<pre><code>    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewtype) {
+        CounterViewHolder holder = new CounterViewHolder(new TextView(parent.getContext()));
+        return holder;
+    }
+</code></pre>
+<p>The <code>Context</code> needed to create the <code>TextView</code> is given by the parent view.</p>
+<h3>Bind the data to the view</h3>
+<p>The <code>public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position)</code> method provides as arguments a <code>ViewHolder</code> and a <code>position</code></p>
+<p>The code should update the view in the ViewHolder with the data for the given <code>position</code>.</p>
+<p>Our data is <code>Integer value = mSaved.get(position)</code></p>
+<p>And we know for sure that the itemView that contains the ViewHolder is a TextView.</p>
+<p><code>TextView textView = (TextView) viewHolder.itemView;</code></p>
+<p>Then we just have to update the <code>TextView</code> :</p>
+<pre><code>    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        Integer value = mSaved.get(position);
+        TextView textView = (TextView) viewHolder.itemView;
+        textView.setText(Integer.toString(value));
+    }
+</code></pre>
+<p>Your adapter is ready to be used</p>
+<h2>Test it now !!!</h2>
+<p>In the <code>SavedActivity</code>, get the <code>RecyclerView</code> object using the <code>findById</code> method.</p>
+<p>Setup the <code>RecyclerView</code> to use the <code>SavedCountersAdapter</code> using the <code>setAdapter</code> method and choose a 2 column layout (but you can play with other layout type) using the <code>setLayoutManager</code>.</p>
+<p>It should display the list.</p>
+<p>Not the best ever UI in the world but we will manage that.</p>
+<h3>Use Xml to create the TextView</h3>
+<p>As we define the full page layout to define the widgets that will be created in a activity, we can also define the widget that will be created for a list item.</p>
+<p>Create a layout <code>list_item_saved_counter</code> with a single button that will display the counter value (You can reuse the TextView of the main activity).</p>
+<pre><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;
+&lt;android.support.constraint.ConstraintLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;
+    xmlns:app=&#34;http://schemas.android.com/apk/res-auto&#34;
+    android:layout_he    android:layout_width=&#34;match_parent&#34;
+ight=&#34;wrap_content&#34;
+    android:layout_margin=&#34;10dp&#34;&gt;
+
+    &lt;Button
+        android:id=&#34;@+id/button&#34;
+        android:layout_width=&#34;match_parent&#34;
+        android:layout_height=&#34;wrap_content&#34;
+        android:fontFamily=&#34;sans-serif&#34;
+        android:text=&#34;0&#34;
+        android:textAlignment=&#34;center&#34;
+        android:textColor=&#34;@android:color/white&#34;
+        android:textSize=&#34;72sp&#34;
+        android:textStyle=&#34;bold&#34;
+        android:background=&#34;@color/screenBackground&#34;
+        app:layout_constraintBottom_toBottomOf=&#34;parent&#34;
+        app:layout_constraintLeft_toLeftOf=&#34;parent&#34;
+        app:layout_constraintRight_toRightOf=&#34;parent&#34;
+        app:layout_constraintTop_toTopOf=&#34;parent&#34;
+        /&gt;
+&lt;/android.support.constraint.ConstraintLayout&gt;
+</code></pre>
+<p>Now we will use it as an <code>itemView</code> in the <code>Adapter</code></p>
+<p>To manually create a View from a XML layout file, we need a <code>Infalter</code>. It&#39;s provided by the <code>Context</code>.</p>
+<p><code>LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());</code></p>
+<p>Infalter will create the view objects for you from a XML resource.</p>
+<p><code>View v = inflater.inflate(R.layout.list_item_saved_counter, parent, false);</code></p>
+<p>So now your `onCreateViewHolder should looks like</p>
+<pre><code>@NonNull
+@Override
+public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int itemType) {
+    LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+    View v = inflater.inflate(R.layout.list_item_saved_counter, parent, false);
+    return new CounterViewHolder(v);
+}
+</code></pre>
+<p>But now the <code>onBindViewholder</code> method will crash with a <code>ClassCastException</code> when we try to cast the view holded by the <code>ViewHolder</code> into a <code>TextView</code></p>
+<p>That&#39;s fear, the view holded is no more a TextView but a <code>ConstraintLayout</code></p>
+<h3> update the binder</h3>
+<p>Now you should change the binder to find by id the Button in the layout and set the value.</p>
+<p>Each <code>View</code> object have a <code>findById</code> method for this purpose.</p>
+<pre><code>    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        final int value = mSaved.get(position);
+        Button button = viewHolder.itemView.findViewById(R.id.list_item_button);
+        button.setText(value);
+    }
+</code></pre>
+<p>This should looks like</p>
 <p><img alt="saved" style="max-width: 320.00px" src="img/d5a996449e3cd620.png"></p>
+<h2>Generic is cheaper</h2>
+<p>At this point, you should ask yourself something like: &#34;But why this ViewHolder ? This really complicates every thing for nothing.&#34;</p>
+<p>Let&#39;s see if we refactor the code to make things simpler</p>
+<p>First the <code>RecyclerView.Adpater</code> is generic.</p>
+<p><code>public abstract static class Adapter&lt;T extends RecyclerView.ViewHolder&gt;</code></p>
+<p>This means that it&#39;s allow you to manage you any class that extends <code>RecyclerView.ViewHolder</code>.<br>And the good news is that we have a <code>CounterViewHolder</code> that is an extension of a <code>ViewHolder</code>.</p>
+<h3>Specialize your Adapter</h3>
+<p>Change the <code>SavedCounterAdpater</code> class so it extends a <code>RecyclerView.Adapter&lt;SavedCountersAdapter.CounterViewHolder&gt;</code></p>
+<pre><code>public class SavedCountersAdapter extends RecyclerView.Adapter&lt;SavedCountersAdapter.CounterViewHolder&gt; {
+    ...
+}
+</code></pre>
+<p>Studio is not happy with that:</p>
+<ul>
+<li>It complains that <code>CounterViewHolder</code> is <code>private</code><br>Let&#39;s decalre it as <code>protected</code></li>
+<li>It conplains that 2 methods of your class is missing. The <code>onCreateViewHolder</code> and the <code>onCreateViewHolder</code>.<br>Let&#39;s generate them using the &#34;Alt+Enter&#34; trick and compare them to the one we already have.<br>Fix the old one. Remove the useless generated ones. Now the 2 methods handle <code>CounterViewHolder</code></li>
+</ul>
+<h3>Simplify the binding</h3>
+<p>The good point of handling <code>CounterViewHolder</code> is that we will be able to store quick access to the views holded in it<br>to minize the stuff to do during the binding.</p>
+<p>The binding method is call realy often we the user scroll the list and update of the view should be realy quick if you don&#39;t<br>want that your list lags during the scroll.</p>
+<p>For instance, the <code>findViewById</code> shall be done once for all at the creation of the <code>CounterViewHolder</code>, no needs to do it during each binding.</p>
+<p>Let&#39;s do that:</p>
+<p>Add a filed <code>Button button</code> in the <code>CounterViewHolder</code> and call the <code>FindViewById</code> in the constructor of the <code>CounterViewHolder</code>.</p>
+<pre><code>    static protected class CounterViewHolder extends RecyclerView.ViewHolder {
+        Button button;
+
+        public CounterViewHolder(View v) {
+            super(v);
+            button = v.findViewById(R.id.list_item_button);
+        }
+    }
+</code></pre>
+<p>Now the <code>onBindViewHolder</code> can be simplified like:</p>
+<pre><code>    @Override
+    public void onBindViewHolder(@NonNull CounterViewHolder viewHolder, int position) {
+        final int value = mSaved.get(position);
+        viewHolder.button.setText(String.valueOf(value));
+    }
+</code></pre>
+<p>Which is much more simpler than the previous one, isn&#39;t it ?</p>
+<p>Maybe not with this example, but with more complex list item, it will make your code easier to read and maintain.</p>
+<h3>Try to remember</h3>
+<p>Binding should be quick as we may bind thousands of data to the view in few seconds when scrolling.</p>
+<p>View and ViewHolder creation may be slower as we will create only a few of them. Only the ones needed to fill a page of the list.</p>
 <h2>Handle user click</h2>
+<p>Now, what we want, is that when a user click on a item of the list, the value is set as the new counter in the <code>MainActivity</code></p>
 <p>Dislike the <code>ListView</code>, the RecyclerView doesn&#39;t have <code>OnItemClickListener</code>. You need to do it by yourself.</p>
 <p>Create an <code>OnSavedCounterClickListener</code> interface in the <code>Adapter</code> with a method declaration <code>void onSavedCounterClicked(int value)</code>.</p>
-<p>Pass this listener the <code>Adapter</code> constructor as an argument and in the binder method, set the OnCLickListener of the button to call back the<br>Listeners when the user click on the button.</p>
+<p>Pass this listener the <code>Adapter</code> constructor as an argument and in the binder method, set the OnCLickListener of the button to call back the Listeners when the user click on the button.</p>
+<p>So the <code>onBindViewHolder</code> becomes:</p>
+<pre><code>    @Override
+    public void onBindViewHolder(@NonNull CounterViewHolder viewHolder, int position) {
+        final int value = mSaved.get(position);
+        viewHolder.button.setText(String.valueOf(value));
+        viewHolder.button.setOnClickListener((view) -&gt; {mListener.onSavedCounterClicked(value);});
+    }
+</code></pre>
 <p>In the SavedActivity, you need to pass to the &#34;SavedCountersAdapter&#34; an implementation of the listener. You can either:</p>
 <ul>
 <li>Make the SavedActivity implements the listener</li>
@@ -193,7 +363,12 @@
 <pre><code>        mActivityMainDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 </code></pre>
 <p>Then, the <code>mActivityMainDataBinding</code> should have reference to all the widget with an id in the layout.</p>
-<p>Use it in the <code>updateUI</code> method</p>
+<p>Use it in the <code>updateUI</code> method:</p>
+<pre><code>    private void updateUI(int value) {
+        // Update the text view.
+        mActivityMainDataBinding.textView.setText(Integer.toString(value));
+    }
+</code></pre>
 <p>Do the same in the others activity.</p>
 
 
@@ -207,14 +382,14 @@
 <h2>LiveData in Counter</h2>
 <p>In the <code>Counter</code> object change the <code>int value</code> into a  <code>MutableLiveData&lt;Integer&gt; mCount</code>.</p>
 <p>Change the <code>get</code> method to return the <code>LiveData</code>.</p>
-<p>Change the <code>setresetincisInit</code> methods to update or read the value of the LiveData.</p>
+<p>Change the <code>set</code> method, the <code>reset</code> method, the <code>inc</code> method and the <code>isInit</code> method to update or read the value of the LiveData.</p>
 <p>To get the value, use <code>Integer mCount.getValue()</code></p>
 <p>To update the value, use <code>void mCount.postValue(Integer v)</code></p>
 <p>Each time a call to <code>postValue</code> is made, all the observer of the LiveData will be called.</p>
 <p>In the <code>MainActivity</code>, register an obeserver to the LiveData.</p>
 <pre><code>    mCounter.get().observe(this, this::updateUI);
 </code></pre>
-<p>Now you can remove all other calls to the <code>updateUI</code> methods but all calls to <code>Counterset</code>, <code>reset</code> and <code>inc</code> methods should trigger an UI update.</p>
+<p>Now you can remove all other calls to the <code>updateUI</code> methods but all calls to <code>Counter</code> : <code>set</code>, <code>reset</code> and <code>inc</code> methods should trigger an UI update.</p>
 <h2>Add suspense to RandomActivity</h2>
 <p>In the <code>RandomActivity</code>, we can use LiveData to add some more suspense.</p>
 <p>In the <code>random</code> package, create a <code>Random</code> class holding a <code>MutableLiveData&lt;String&gt;</code>. This data will be updated by a Generator.</p>

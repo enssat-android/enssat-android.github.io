@@ -410,6 +410,47 @@ Ne pas oublier de libérer la mémoire après avoir utiliser le .remark-code[Cur
      }  
 ]
 
+---
+## Room
+
+Room fournit une couche d'abstraction au dessus de SQL Lite qui facilite énormément la 
+manipulation de la base de données.
+<center><img  width="50%" src="img/room_architecture.png"/></center><br>
+Le mapping entre les tables (SQL) et les objets (Java) va se faire automatiquement.
+
+---
+
+## Room
+
+.remark-code[entités
+
+    @Entity
+    public class User {
+        @PrimaryKey
+        private int uid;
+        @ColumnInfo(name = "first_name")
+        private String firstName;
+    }
+]
+.remark-code[DAO
+
+    @Dao
+    public interface UserDao {
+        @Query("SELECT * FROM user")
+        List<User> getAll();
+        @Insert
+        void insertAll(User... users);
+        @Delete
+        void delete(User user);
+    }
+]
+.remark-code[Database
+
+    @Database(entities = {User.class}, version = 1)
+    public abstract class AppDatabase extends RoomDatabase {
+        public abstract UserDao userDao();
+    }
+]
 
 ---
 template: inverse

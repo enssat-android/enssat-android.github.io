@@ -137,6 +137,8 @@ layout:false
 - Service
 - IntentService
 - BroadcastReceiver
+- JobScheduler
+- Doze
 
 
 ---
@@ -221,9 +223,49 @@ class MyActivity extends Activity {
 ```
 
 ---
+
+```
+public class AppExecutors {
+    ...
+    private static AppExecutors sInstance;
+    private final Executor diskIO,mainThread,networkIO;
+
+    private AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
+        this.diskIO = diskIO;
+        ...
+    }
+
+    public static AppExecutors getInstance() {
+      if (sInstance == null) {
+          synchronized(LOCK){
+              sInstance = new AppExecutors(Executors.newSingleThreadExecutor(),
+                        Executors.newFixedThreadPool(3),
+                        new MainThreadExecutor());
+          }
+      }
+      return sInstance;
+    }
+
+    public Executor diskIO() { return diskIO; }
+
+    public Executor mainThread() { return mainThread; }
+
+    public Executor networkIO() { return networkIO; }
+
+    private static class MainThreadExecutor implements Executor {
+        private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
+        @Override
+        public void execute(@NonNull Runnable command) {
+            mainThreadHandler.post(command);
+        }
+    }
+```
+
+---
 ## AsyncTask
 
-Android fournit une les .remark-code[AsyncTask] pour interagir avec l'UI pendant la tâche de fond.
+Android fournit les .remark-code[AsyncTask] pour interagir avec l'UI pendant la tâche de fond.
 
 ```
     class AsyncCreateString extends AsyncTask<Long, Integer, String> {
@@ -232,7 +274,7 @@ Android fournit une les .remark-code[AsyncTask] pour interagir avec l'UI pendant
         protected String doInBackground(Long... seed) {
             String result = null;
             // loop to create result 
-                updateProgress(progress)
+                publishProgress(progress)
             // end loop
             return result;
         }
@@ -252,8 +294,6 @@ Android fournit une les .remark-code[AsyncTask] pour interagir avec l'UI pendant
 
 ```
 
-
-
 ---
 template: inverse
 # Service
@@ -265,21 +305,22 @@ template: inverse
 
 Les services sont des moyens d'exposer une interface à l'ensemble d'une application, voir même aux applications externes
 
-Il doivent être déclaré dans le Manifest de l'application
+Comme des .remark-code[Activity] (mais sans UI), les services :
+- ont un cycle de vie dicté par le système 
 
-Les services ont leur propre cycle de vie, indépendante de l'UI
+- doivent être déclarés dans le Manifest de l'application
+
 
 On les utilise: 
-- pour fournir un functionalité : par exemple, Service de voix sur IP
+- pour fournir une functionalité : par exemple, Service de voix sur IP
 
 - pour accéder à un traitement en tâche de fond : par exemple, Service qui joue de la musique, Service de navigation, Service de comptage de pas
 
 
-.green[une Service n'est pas un Thread, Les traintements long doivent se faire dans un worker Thread]
-
+.green[une Service n'est pas un Thread, les traitements long doivent se faire dans un worker Thread]
 
 ---
-## Invoquer un service
+## Invoquer un Service
 
 Deux manières d'invoquer un .remark-code[Service] :
 
@@ -307,6 +348,49 @@ qui s'arrêtera quand l'UI appele la commande
 context.stopService(intent);
 ```
 
+---
+
+## Invoquer un Service
+
+Un service est invoqué avec un Intent:
+- explicite
+```
+Intent intent1 = new Intent(ctxt, ExampleService.class);
+Intent intent2 = new Intent(); 
+intent2.setPackageName("fr.enssat.android"); 
+intent2.setAction("fr.enssat.android.action.CUSTOM_ACTION");
+```
+
+- implicite
+```
+Intent intent = new Intent(); 
+intent.setAction(ACTION_CUSTOM); 
+intent.addCategory(CATEGORY_CUSTOM)
+```
+.green[Depuis Android 5, pour des raisons de securité, il n'est plus possible de démarrer un .remark-code[Service] avec un intent implicite]
+---
+## Déclarer un service
+
+```
+<permission
+  android:name="fr.enssat.android.permission.CUSTOM_PERM"
+  android:protectionLevel="signature"/>
+
+<service 
+  android:name=".ExampleService"
+  android:description="sera affiché à l'utilisateur"
+  android:permission="fr.enssat.android.permission.CUSTOM_PERM"> 
+  <intent-filter><!-- plus nécessaire depuis Android 5-->
+    <action android:name="fr.enssat.android.action.CUSTOM_ACTION" /> 
+    <category android:name="fr.enssat.android.category.CUSTOM_CATEGORY" />
+  </intent-filter> 
+</service>
+  
+```
+
+- La définition d'un IntentFilter pour un Service l'exporte automatiquement (le rendant accessible à d'autres applications).
+
+- Il est possible de "protéger" un Service via une permission afin par exemple d'autoriser son utilisation par les applications ayant la même signature. 
 ---
 ## Cycle de vie d'un Service
 
@@ -344,9 +428,9 @@ Le client le reçoit dans la *callback* du .remark-code[ServiceConnection] passe
 
 **L**anguage de **D**éfinition d'une **I**nterface **A**ndroid : .green[AIDL]
 
-Il est pré-processé par le sdk Android pour créer un .remark-code[Stub] à surchargé coté service.
+Il est pré-processé par le sdk Android pour créer un .remark-code[Stub] à surcharger coté .remark-code[Service].
 
-Ce Stub est un .remark-code[Binder] qui peut être passer lors du _bind_ des clients
+Ce Stub est un .remark-code[Binder] qui peut être passé lors du _bind_ des clients
   
 Il permet de faire des appels de fonctions entre différents processus Android.
 
@@ -365,7 +449,19 @@ interface IMyAidlInterface {
             double aDouble, String aString);
 }
 ```
-.green[Tous les types non basic doivent implémenté l'interface .remark-code[Parcelable]]
+.green[Tous les types non basic doivent implémenter l'interface .remark-code[Parcelable]]
+
+---
+## Binder
+
+- Un mécanisme de communication inter process (IPC). 
+- S'appuie sur un module noyaux
+- Très largement utilisé dans le framework Android (service système, ...)
+
+
+<center>
+  <img src="img/binder.svg" />
+</center>
 
 ---
 ## IntentService
@@ -394,7 +490,7 @@ public class MyIntentService extends IntentService {
 template: inverse
 # Broadcast Receiver
 
-"On nous signal du changement"
+"On nous signale du changement"
 
 ---
 ## BroadcastReceiver
@@ -455,6 +551,92 @@ Soit dans dynamiquement dans le code
 
 
 
+---
+template: inverse
+# JobScheduler
+
+---
+## JobScheduler
+
+Fournit une API qui permet de planifier des tâches à réaliser en background.
+
+```
+serviceComponent = new ComponentName(this, MyJobService.class);
+JobInfo.Builder builder = new JobInfo.Builder(id, serviceComponent);
+builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
+builder.setRequiresCharging(true)
+
+JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+tm.schedule(builder.build());
+```
+
+Il simplifie beaucoup l'expression des conditions nécessaires à l'execution du Job
+
+Le JobScheduler étant un service système, il a la possibilité d'optimiser la séquence de déclenchement 
+des Job définis par chacune des applications.
+ 
+---
+## JobScheduler
+
+Déclaration dans le Manifest
+```
+<service
+    android:name=".service.MyJobService"
+    android:permission="android.permission.BIND_JOB_SERVICE"
+    android:exported="true"/>
+```
+
+MyJobService.java
+```
+public class MyJobService extends JobService {
+
+  @Override
+  public boolean onStartJob(final JobParameters params) {
+  }
+
+  @Override
+  public boolean onStopJob(JobParameters params) {
+  }
+}
+
+public abstract class JobService extends Service {
+}
+```
+---
+template: inverse
+# WorkManager
+---
+## WorkManager
+.remark-code[WorkManager] a été introduit récemment et fait partie de androidx.
+Cette API s'appuie sur le .remark-code[JobScheduler], Firebase JobDispatcher ou .remark-code[AlarmManager] en fonction du contexte.
+
+Elle inclut:
+- .remark-code[Worker]: class abstraite dont on hérite pour définir la tâche à réaliser.
+- .remark-code[WorkerRequest]: une tâche désignant un Worker qui doit s'éxécuter. Elle peut préciser des conditions préalable
+à l'execution (à l'image du JobScheduler). 
+- .remark-code[WorkManager]: planifie l'execution des WorkerRequest en optimisant l'usage des resources système et garantissant 
+les conditions nécessaires à leur execution.  
+- .remark-code[WorkStatus]: info sur les status d'une WorkRequest. Le WorkManager fournit un .remark-code[LiveData] de .remark-code[WorkStatus] pour chaque .remark-code[WorkRequest]. 
+
+.green[C'est la manière de faire recommandée en 2018]
+---
+template: inverse
+# Doze
+---
+## Doze
+
+Introduit avec Android 6.0, Doze est un mode d'économie d'énergie qui s'active lorsque que le téléphone n'est pas utilisé
+(écran éteint, pas de mouvement) et pas en charge.
+
+- Pas d’accès au réseau
+- Pas de WakeLock
+- Alarm stockées pour plus tard
+- Pas de JobScheduler
+
+
+<center>
+  <img width="100%" src="img/doze.png" />
+</center>
 ---
 template: inverse
 # Merci

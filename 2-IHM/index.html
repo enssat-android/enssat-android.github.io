@@ -125,7 +125,7 @@ class: center, middle, inverse
 # Android Interface Homme Machine
 
 ENSSAT
-2018-2019
+2019-2020
 
 Guillaume Châtelet
 
@@ -178,14 +178,14 @@ Les Context permettent d'interagir avec le système
 - Créés par le système en utilisant les Intent
 
 .remark-code[
-Intent intent = new Intent(Context context, ReadMailActivity.class) ;
-context.startActivity(intent);]
+val intent = Intent(context, ReadMailActivity::class.java)
+context.startActivity(intent)]
 
 - L'interface de l'application est un empilement d'activités
 
 - Tués par l'utilisateur (Touche "Back") ou dans le code .remark-code[finish()]
 
-### le code doit réagir au demande du système
+### Le code doit réagir au demande du système
 
 Coder une activité revient à coder les actions à faire quand le système stimule l'activité. Le système va appeler des méthodes dédiées appelées ".green[Callbacks]"
 
@@ -241,10 +241,9 @@ La première chose à faire dans une activité
 
 .remark-code[Dans la callback onCreate
 
-    @Override 
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_read_mail);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_read_mail)
     }]
 
 
@@ -342,16 +341,26 @@ Espaces :
 ---
 ## Layouts et Vues dans le code
 
-Les fichiers .remark-code[layout.xml] sont analysés par le .remark-code[LayoutInflater] qui transforme le XML en objet java
+Les fichiers .remark-code[layout.xml] sont analysés par le .remark-code[LayoutInflater] qui transforme le XML en objet java à coup de réflection.
+
+Les paramètres du XML sont donnés aux objets mais on a souvent besoin de customiser dans le code.
+
 
 Dans le code, on peut :
 
 - retrouver les objets java créés
-- modifier dynamiquement des attributs en utilisant les objet Java
-- enregistrer des callback pour les actions utilisateurs 
+- modifier dynamiquement des attributs en utilisant les objets
+- enregistrer des callback pour les actions utilisateurs
+
+Point Jetpack : on peut même maintenant déclarer des objets dans le XML comme porteurs des données à afficher. Modifier les valuers dans de cet objet dans le code modifie automatiquement l'affichage.
+
+Attention au nombre de mise à jour de l'affichage que cela peut induire.
 
 
-.remark-code[Exemple :
+
+---
+## Exemple de code (Java/Kotlin)
+.remark-code[Exemple en Java :
 
     helloText = (TextView) findViewById(R.id.text);
     button = (Button) findViewById(R.id.button);
@@ -360,8 +369,15 @@ Dans le code, on peut :
             public void onClick(View view) {
                 helloText.setText("button clicked");
             }
-        });
+    });
+Exemple en Kotlin :
+
+    helloText = findViewById(R.id.text) as TextView
+    button = findViewById(R.id.button) as Button
+    button.setOnClickListener { view -> helloText.text = "button clicked"}
 ]
+
+Kotlin est fortement poussé par Google. Les exemples de code suivant seront en Kotlin.
 
 ---
 template: inverse
@@ -374,9 +390,9 @@ template: inverse
 
 .remark-code[afficher un Toast :
 
-       String text = "Message seved as draft";  
-       Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-       toast.show();]
+      val text = "Message saved as draft"  
+      val toast = Toast.makeText(context, text, Toast.LENGTH_LONG)
+      toast.show()]
 
 # 
 
@@ -389,16 +405,12 @@ template: inverse
 
 .remark-code[afficher une SnackBar :
 
-      String text = "Archived";
-      Snackbar snackbar = Snackbar
-        .make(findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG);
-        .setAction("UNDO", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               /* TODO undo last action */
-            }
-        });
-      snackbar.show();]
+        val text = "Archived";
+        val snackbar = Snackbar
+            .make(findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG)
+            .setAction("UNDO") { view -> /*TODO undo*/ }
+        snackbar.show();
+]
 
 
 <center>
@@ -410,19 +422,18 @@ template: inverse
 
 .remark-code[afficher un Dialog :
 
-        DialogInterface.OnClickListener listener = new DialogInterface () {
-            public void onClick(DialogInterface dialog, int id) {
-                /* TODO handle click id = POSITIVE | NEGATIVE | NEUTRAL */  
-            } 
-        };
+        val listener = { dialog: DialogInterface, which: Int ->
+            /* TODO handle click id = POSITIVE | NEGATIVE | NEUTRAL */
+        }
+        
+        val dialog = AlertDialog.Builder(getActivity())
+            .setMessage(R.string.dialog_alert_title)
+            .setPositiveButton(R.string.fire, listener)
+            .setNegativeButton(R.string.cancel, listener)
+            .create()
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(R.string.dialog)
-               .setPositiveButton(R.string.fire, listener)
-               .setNegativeButton(R.string.cancel, listener);
-        // Create the AlertDialog object and return it
-        Dialog dialog = builder.create();
-        dialog.show();]
+        dialog.show()
+]
 
 ### 
 
@@ -457,30 +468,21 @@ template: inverse
 
 .remark-code[Callback de création
    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.game_menu, menu);
-        return true;
-    }]
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+]
 
 .remark-code[Callback de sélection
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.new_game:
-                newGame();
-                return true;
-            case R.id.help:
-                showHelp();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> /* TODO launch the settings */ true
+            else -> super.onOptionsItemSelected(item)
         }
-    }]
-
+    }
+]
 
 ---
 template: inverse
@@ -491,7 +493,7 @@ template: inverse
 ---
 ## ListView pour afficher des listes
 
-Les listView sont des vues pour afficher des listes de données
+Les .remark-code[ListView] sont des vues pour afficher des listes de données
 
 Nécessite un .remark-code[Adapter] chargé de :
 - créer des vues pour les items de la liste
@@ -503,34 +505,29 @@ Le SDK permet de recycler les vues qui ne sont plus affichées
 
 .remark-code[ exemple :
 
-        ListView listView = (ListView) findViewById(R.id.list);
-        listView.setAdapter(adapter);]
+        val listView = findViewById(R.id.list) as ListView
+        listView.adapter = adapter]
 
 ---
 ## Code de l'Adapter
 .remark-code[ exemple :
 
-    BaseAdapter adapter = new BaseAdapter() {
+    val adapter = object : BaseAdapter() {
+        override fun getCount(): Int = list.size
 
-        @Override public int getCount() { return list.length; }
+        override fun getItem(position: Int): Any = list[position]
 
-        @Override public Object getItem(int i) { return list[i]; }
+        override fun getItemId(position: Int): Long = list[position].id
 
-        @Override public long getItemId(int i) { return 0; }
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = if (convertView != null) convertView else
+                View.inflate(parent.context, android.R.layout.simple_list_item_1, null);
 
-        @Override
-        public View getView(int position, View viewToRecycle, ViewGroup viewGroup) {
-            View itemView = viewtoRecycle;
-            if (itemView == null)
-                 itemView = View.inflate(context, android.R.layout.simple_list_item_1, null);
-
-            TextView text = (TextView) itemView.findViewById(android.R.id.text1);
-            text.setText((String) getItem(position));
-
-            return itemView;
+            val textview = view.findViewById(android.R.id.text1) as TextView
+            textview.text = list[position].data
+            return view
         }
-    };]
-
+    }]
 
 ---
 ## RecyclerView
@@ -542,19 +539,37 @@ Différents arrangements des views est possible :
 - En grille aligné ou en quinconce
 
 Réarangement des items est possible
-
 Des actions comme "slide to delete" ou "slide to archive" 
-
 L'animation des views est prévue aussi
+
+Attention: Les .remark-code[RecyclerView] impose d'encapsuler les vues des items dans des .remark-code[RecyclerView.ViewHolder]. La creation et la mise à jour se fait en deux temps.
+
+---
+## RecyclerView en action
 
 .remark-code[ exemple :
 
-       @Override
-       public void onBindViewHolder(CustomViewHolder holder, int position) {
-         // Find out the data, based on this view holder's position
-         String thisItemsName = myNameList.get(position);
-         holder.nameTextView.setText(thisItemsName);
-       }]
+    class CustomViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+          var data: Any? = null
+            set(value) {
+                //TODO change the itemView with the data 
+                field = value
+            }
+    }
+
+    val adapter = object: RecyclerView.Adapter<CustomViewHolder>() {
+
+        override fun getItemCount(): Int = list.size
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
+            val view = View.inflate(parent.context, android.R.layout.simple_list_item_1, null)
+            return CustomViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
+            holder.data = list[position].data
+        }
+    }]
 
 
 ---
@@ -572,19 +587,21 @@ Possiblité de récupérer les pointeurs sur les objets créé par un Layout dan
 
 .remark-code[ Binding :
 
-      @Override
-      protected void onCreate(Bundle savedInstanceState) {
-          super.onCreate(savedInstanceState);
-          ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-          User user = new User("Test", "User");
-          binding.setUser(user);
-      }]
+      val myGreetings = Greetings()
+
+      override fun onCreate(savedInstanceState: Bundle?) {
+          super.onCreate(savedInstanceState)
+          val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+          binding.greetings = myGreetings
+          binding.lifecycleOwner = this
+      }
+]
 
 .remark-code[ Layout :
 
         <TextView android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{user.firstName}" />
+            android:text="@{greetings.message}" />
 ]
 
 ---
@@ -620,6 +637,7 @@ Très utile pour séparer définitivement l'UI des données
 
 
 
+
 ---
 template: inverse
 # Morceau d'IHM
@@ -633,7 +651,7 @@ Les fragments sont apparus avec le support des tablettes.
 
 Ils permettent de découper les activités. Aussi utilisé pour afficher des morceaux de l'IHM.
 
-Ils ont leur propre cycle de vie. 
+Ils ont leur propre cycle de vie.
 
 ### Réutilisation de code dans différentes activités
 
@@ -714,20 +732,21 @@ template: inverse
 ---
 ## Accesibilité pour qui ?
 
-Vous connaissez sûrement quelqu'un qui rencontre les difficultés suivante:
+Vous connaissez sûrement quelqu'un qui rencontre les difficultés suivantes :
 * Problème de vue (Myopie)
 * Dyschromatopsie (Daltonisme)
-* Cécisté (complète ou partielle)
+* Cécité (complète ou partielle)
 * Paralysie
+* ...
 
-### Il faut penser aussi à eux quand on développe
+### Il faut penser à tout quand on développe
 
 Des outils sont disponibles dans Android 
 
 voir Settings d'accessibilité
 
 * Augmentation de la taille des fontes
-* Recommendations design
+* Recommandations design
 * Navigation à la voix : TalkBack
 * Navigation au clavier ou au Joystick
 
@@ -742,22 +761,22 @@ voir Settings d'accessibilité
 </center>
 
 ---
-## Recommendations design
+## Recommandations design
 
 * Taille des buttons : suffisament large pour clicker sans toucher les autres boutons
-* Contraste : Evitez le gris clair sur blanc, ou rouge sur vert 
-* Information visuelle : Eviter les informations de couleur pure
+* Contraste : Évitez le gris clair sur blanc, ou rouge sur vert 
+* Information visuelle : Éviter les informations de couleur pure
 
 <center>
 <img src="img/accessibilite-1.jpg" height="400px"/>     <img src="img/accessibilite-2.jpg" height="400px"/>   
 </center>
 
 ---
-## Recommendations design
+## Recommandations design
 
 * Taille des buttons : suffisament large pour clicker sans toucher les autres boutons
-* Contraste : Evitez le gris clair sur blanc, ou rouge sur vert 
-* Information visuelle : Eviter les informations de couleur pure
+* Contraste : Évitez le gris clair sur blanc, ou rouge sur vert 
+* Information visuelle : Éviter les informations de couleur pure
 
 <center>
 <img src="img/accessibilite-3.jpg" height="400px"/>   
@@ -768,8 +787,8 @@ voir Settings d'accessibilité
 
 ### Talkback
 
-* Vocalistion des views
-* Navigation à l'aveugle : 
+* VocalisAtion des views et arborescence
+* Navigation à l'aveugle :
   - click to speech 
   - double click press
   - slide un doigt : next element / previous element
@@ -778,8 +797,8 @@ voir Settings d'accessibilité
 
 ### Code
 
-* Rajouter des description aux images
-* Vocaliser UI complèxe : exemple CallLog "Appel de machin à tel heure, Action rappeler"
+* Rajouter des descriptions aux images
+* Vocaliser une UI complexe : exemple CallLog "Appel de machin à telle heure, Action rappeler"
 * La navigation doit être propre : passage de focus 
      
 ---
@@ -787,7 +806,7 @@ voir Settings d'accessibilité
 
 ### La navigation doit être propre : passage de focus
 
-* information pertinante seulement
+* information pertinente seulement
 
 * pas de navigation interminable
 
@@ -795,7 +814,7 @@ voir Settings d'accessibilité
 
 ### Attention aux fragments
 
-même caché, ils sont là
+même cachés, ils sont là
 
 
 
@@ -816,7 +835,7 @@ template: inverse
     <script>
       var slideshow = remark.create({
           highlightStyle: 'default',
-          highlightLanguage: 'java',
+          highlightLanguage: 'kotlin',
           highlightLines: true
         }) ;
     </script>

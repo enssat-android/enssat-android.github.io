@@ -125,7 +125,7 @@ class: center, middle, inverse
 # Android Introduction
 
 ENSSAT
-2018-2019
+2019-2020
 
 Guillaume Châtelet
 
@@ -156,7 +156,7 @@ attaché à une ligne fixe :
  - 1973 : premier “portable” (Motorola)
  - norme GSM : 1982
 
-- SMS : possibilité d’échanger du texte (données) normalisée en
+- SMS : possibilité d’échanger du texte (données) normalisé en
 1985 en utilisant les canaux de contrôle.
 
 - Déploiement GSM : 1991/92.
@@ -173,7 +173,7 @@ consommation courante du forfait).
 - VoLTE, VoWifi : en cours de déploiement
 
 ---
-## Evolution des terminaux
+## Évolution des terminaux
 
 - téléphone mobile
 
@@ -206,12 +206,12 @@ Mais aussi:
 - NFC : Paiement
 
 ---
-## Evolution
+## Évolution
 
 Le parc :
-- Evolution rapide dans le temps 
+- Évolution rapide dans le temps 
   - des nouveaux terminaux arrivent tous les ans
-- Difficultée de connaitre précisément le parc
+- Difficultés pour connaitre précisément le parc
   - taux de renouvellement des terminaux autour de trois ans
 
 Répartition : 
@@ -235,15 +235,16 @@ template: inverse
 
 Focus :
 
-- Une (ou deux) application en avant à la fois 
+- Une (ou deux) application(s) en avant à la fois 
   - passage d'une application à une autre difficile
 - Petit écran 
   - voir très petit écran (montre connectée)
 - Interaction limitées et variées
   - touch screen 
-  - clavier tactile
   - clavier physique
-  - reconnaissance de voix
+  - clavier tactile
+  - reconnaissance de voix  
+  - écran capacitif : pression
 
 Performances :
 
@@ -363,7 +364,7 @@ template: inverse
 
 - MIDP : profil Java CLDC pour mobile. CLDC est une machine
 virtuelle allégée.
-- Version 1 en 2000 Au départ une sandbox assez fermée.
+- Version 1 en 2000. Au départ une sandbox assez fermée.
 - Version 2 en 2002. Plus complet avec prise en compte de la
 sécurité.
 - D’autres spécifications complètent : MSA subset présent par
@@ -541,13 +542,14 @@ matériel.
 <tr><td>7.0</td><td> Nougat            </td><td>09/16 </td><td>24   </td></tr>
 <tr><td>8.0</td><td> Oreo              </td><td>08/17 </td><td>26   </td></tr>
 <tr><td>8.1</td><td> Oreo              </td><td>12/17 </td><td>27   </td></tr>
-<tr><td>9  </td><td> Pie               </td><td>08/18 </td><td>27   </td></tr>
+<tr><td>9  </td><td> Pie               </td><td>08/18 </td><td>28   </td></tr>
+<tr><td>10 </td><td> Android 10        </td><td>09/19 </td><td>29   </td></tr>
 </table>
 ]
 
 
 ---
-## Evolution
+## Évolution
 
 ### Spécificités
 - Les changements entre 1.6 et 2.x ont donné une impression de
@@ -563,17 +565,18 @@ fragmentation.
 - 7.0 multi fenetrage
 - 8.0 économisateur d'energie
 - 9.0 amélioration ergonomie (E2E screen, notificiations)
+- 10.0 sécurisation des données privés utilisateurs
 
-Bientôt Android Go
+Android Go : version pour device low-hand
 
 ---
-## Repartition des versions (Sept 2018)
+## Repartition des versions ([May 2019](https://developer.android.com/about/dashboards))
 
 # 
  
 
 <center>
-<img width="100%" src="img/chart.png" />
+<img width="100%" src="img/chart_2019.png" />
 </center>
 
 ---
@@ -669,13 +672,12 @@ Mais aussi : orientation, taille de l'écran, version d'Android, opérateur, ...
  - charge les description de l'interface utilisateur
  - décrive la navigation et les actions à faire quand l'utilisateur interagit avec l'application  
  
-les Activity sont empilable les unes sur les autres, on peut les arrêter avec la touche "back" du téléphone. 
+les Activity sont empilables les unes sur les autres, on peut les arrêter avec la touche "back" du téléphone. 
 
 ### "Service" : ce sont les taches de fond de l'application
 
 - rôle :
  - exécute le code de longue durée dans l'application
-
  - typiquement : le composant qui joue la musique dans Deezer est un Service
 
 ---
@@ -685,14 +687,12 @@ les Activity sont empilable les unes sur les autres, on peut les arrêter avec l
 
 - rôle :
  - exécute le code en réaction à un stimuli du système
-
  - typiquement : boot du device, appel GSM
 
 ### "Content Provider" : charger de fournir aux autres applications des données
 
 - rôle :
  - fournir un accès aux données de l'application aux autres applications
-
  - typiquement : base de donnée de contact, de photo, call logs
 
 ---
@@ -731,7 +731,6 @@ en réutilisabilité.
 
 ---
 ## Architecture d'une application Android
-
 <img width="100%" src="img/android-components.svg" />
 
 ---
@@ -835,14 +834,14 @@ Intégration dans Studio mais aussi ligne de commande: .remark-code[./gradlew as
 Android studio crée pour vous un script gradle minimal pour votre projet
 
 ---
-## Emulateurs ou Terminaux de développement  
+## Émulateurs ou Terminaux de développement  
 
 ### Tous les terminaux Android peuvent passer en mode développement
 
 - clicker 10 fois sur le numéro de build dans les paramètres "Etat du téléphone" pour passer en mode développeur. 
 - permet de tester sur des téléphone réel (fragmentation)
 
-### Emulateur
+### Émulateur
 
 - basé sur une émulation du hardware
 - se comporte comme un vrai terminal 
@@ -1037,7 +1036,7 @@ template: inverse
     <script>
       var slideshow = remark.create({
           highlightStyle: 'default',
-          highlightLanguage: 'java',
+          highlightLanguage: 'kotlin',
           highlightLines: true
         }) ;
     </script>

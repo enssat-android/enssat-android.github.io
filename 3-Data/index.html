@@ -171,9 +171,9 @@ template: inverse
 - Contient des Extras : (Key, Value)
 
 ```
-      Intent sms = new Intent(Intent.ACTION_SENDTO, Uri.parse("sms:" + numero));
-      sms.putExtra("sms_body", corpDuSms);
-      startActivity(sms);
+      val sms = Intent(Intent.ACTION_SENDTO, Uri.parse("sms:" + numero))
+      sms.putExtra("sms_body", corpDuSms)
+      startActivity(sms)
 ```
 
 Les Extras peuvent contenir des types Java simple mais aussi des objets plus compliqués
@@ -181,8 +181,8 @@ Les Extras peuvent contenir des types Java simple mais aussi des objets plus com
 Pour lancer les activités
 
 ```
-     Intent intent = new Intent(context, SecondActivity.class);
-     startActivity(intent);
+     val intent = Intent(context, SecondActivity.class)
+     startActivity(intent)
 ```
 
 ---
@@ -191,20 +191,19 @@ Pour lancer les activités
 Pour récupérer une donnée d'une activité que l'on a lancé
 dans le code d'une activité
 
-```java
-    void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_PHOTO);
-    }
+```koltin
+fun pickImage() {
+    val intent = Intent(Intent.ACTION_GET_CONTENT)
+    intent.type = "image/*"
+    startActivityForResult(intent, PICK_PHOTO)
+}
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_PHOTO && resultCode == Activity.RESULT_OK) {
-             // use data.getData() if any
-        }
+override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == PICK_PHOTO && resultCode == Activity.RESULT_OK) {
+        // use data.getData() if any
     }
+}
 ```
 
 
@@ -218,7 +217,7 @@ Par exemple:
 - Activé la recherche ou pas
 - définir quelle liste afficher
 
-Passer de gros volume de donnée dans des Intents est difficile.
+Passer de gros volumes de données dans des Intents est difficile.
 
 ---
 ## Singleton
@@ -226,22 +225,24 @@ Passer de gros volume de donnée dans des Intents est difficile.
 Pour faire une interface pour gérer les donnée
 
 On peut créer des .remark-code[Singletons] pour contenir les données
+```kotlin
+object MySingleton {
 
-.remark-code[exemple de Singleton
+   private val list = mutableListOf<MainActivity.Item>()
 
-    public class MySingleton {
+   fun store(item: MainActivity.Item) {
+        list.add(item)
+   }
 
-        private static MySingleton sInstance;
+   fun getList(): List<MainActivity.Item> {
+        return list
+   }
+}
+```	
 
-        public static MySingleton getInstance() {
-            if (sInstance == null) sInstance = new MySingleton();
-            return sInstance;
-        }
+Pas besoin de `getInstance()`, en Kotlin, on appelle directement `MySingleton.getList()`					
 
-        private MySingleton() {
-        ...
-]  
-
+					
 <img style="float" width="10%" src="img/android-danger-sign.jpg"/>.warning[Difficile à tester, La création de l'instance peut prendre du temps]
 
 ---
@@ -260,18 +261,20 @@ Possibilité de générer une interface (type Settings du téléphone) pour modi
 
 .remark-code[get a shared preference
 
-        SharedPreferences sharedPref = context.getSharedPreferences(
-             preference_file_key, Context.MODE_PRIVATE);
-        String userName = sharedPref.getString(USER_NAME);
+    fun getUserName(context: Context): String? {
+        val sharedPref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
+        return sharedPref.getString(USER_NAME, null)
+    }
 ]
 
 .remark-code[set a shared preference
 
-        SharedPreferences sharedPref = context.getSharedPreferences(
-             preference_file_key, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(USER_NAME, userName);
-        editor.apply();
+    fun setUserName(context: Context, userName: String) {
+        val sharedPref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putString(USER_NAME, userName)
+        editor.apply()
+    }
 ]
 
 .green[suivant le .remark-code[Context], les shared preferences peuvent etre associé à une activité ou à l'application]
@@ -315,31 +318,30 @@ template: inverse
 
 Android contient la librairie SQLite qui permet de gérer des base de données
 
-Un wrapper permet de créer des bases _facilement_
-
 .remark-code[SQLiteOpenHelper 
 
-    public class FeedReaderDbHelper extends SQLiteOpenHelper {
-        // If you change the database schema, you must increment the database version.
-        public static final int DATABASE_VERSION = 1;
-        public static final String DATABASE_NAME = "FeedReader.db";
+    const val DATABASE_VERSION = 1; // update the version each time it change (release versions)
+    const val DATABASE_NAME = "FeedReader.db";
 
-        public FeedReaderDbHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(SQL_CREATE_ENTRIES);
-        }
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            // This database is only a cache for online data, so its upgrade policy is
-            // to simply to discard the data and start over
-            db.execSQL(SQL_DELETE_ENTRIES);
-            onCreate(db);
-        }
-        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            onUpgrade(db, oldVersion, newVersion);
-        }
-   }]
+    class FeedReaderDhHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+    val SQL_CREATE_ENTRIES = """CREATE TABLE ... """
+
+    override fun onCreate(db: SQLiteDatabase?) {
+        db?.execSQL(SQL_CREATE_ENTRIES)
+    }
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        // modify the tables and add data if needed
+
+        // avoid reading all the entries in memory to restore it into the new database
+        // it can be really time consuming
+    }
+    override fun onDowngrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        // optional but if you're not sure about your upgrade it can be use full
+        // modify the tables, revert changes of the onUpgrade
+    }
+}
+]
 
 ---
 ## Base de données : insertion
@@ -348,16 +350,17 @@ Les ContentValues permettent d'insérer plusieurs données dans la table
 
 .remark-code[db.insert 
 
-     // Gets the data repository in write mode
-     SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    val mDbHelper = FeedReaderDhHelper(context)
 
-     // Create a new map of values, where column names are the keys
-     ContentValues values = new ContentValues();
-     values.put(FeedEntry.COLUMN_NAME_TITLE, title);
-     values.put(FeedEntry.COLUMN_NAME_SUBTITLE, subtitle);
+    fun insert(title: String, subtitle: String) {
+        val dbWritter = mDbHelper.writableDatabase
 
-     // Insert the new row, returning the primary key value of the new row
-     long newRowId = db.insert(FeedEntry.TABLE_NAME, null, values);
+        val values = ContentValues().apply {
+            put(COLUMN_NAME_TITLE, title)
+            put(COLUMN_NAME_SUBTITLE, subtitle)
+        }
+        dbWritter.insert(TABLE_NAME, null, values)
+    }
 ]
 
 On peut spécifier des politiques en cas de collision
@@ -369,27 +372,25 @@ Les requêtes donne des .remark-code[Cursor] qui permettent de naviguer dans les
 
 .remark-code[db.query
 
-    // Define a projection that specifies which columns from the database
-    // you will actually use after this query.
-    String[] projection = {
-        FeedEntry._ID,
-        FeedEntry.COLUMN_NAME_TITLE,
-        FeedEntry.COLUMN_NAME_SUBTITLE
-        };
+    fun read(title: String): Cursor? {
+        val projection = arrayOf(
+            COLUMN_NAME_ID,
+            COLUMN_NAME_TITLE,
+            COLUMN_NAME_SUBTITLE)
+        val selection = "${COLUMN_NAME_TITLE} = ?"
+        val arguments = arrayOf(title)
 
-    // Filter results WHERE "title" = 'My Title'
-    String selection = FeedEntry.COLUMN_NAME_TITLE + " = ?";
-    String[] selectionArgs = { "My Title" };
-
-    Cursor c = db.query(
-        FeedEntry.TABLE_NAME,                     // The table to query
-        projection,                               // The columns to return
-        selection,                                // The columns for the WHERE clause
-        selectionArgs,                            // The values for the WHERE clause
-        null,                                     // don't group the rows
-        null,                                     // don't filter by row groups
-        null                                      // The sort order
-        );
+        val dbReader = mDbHelper.readableDatabase
+        return dbReader.query(
+            TABLE_NAME,     // name of the table
+            projection,     // projection of the result
+            selection,      // select string
+            arguments,      // arguments that will replace '?' in selection
+            null,           // group by
+            null,           // having
+            null            // order by
+        )
+    }
 ]
 
 ---
@@ -399,15 +400,19 @@ Ne pas oublier de libérer la mémoire après avoir utiliser le .remark-code[Cur
 
 .remark-code[navigation
 
-     
-     if (cursor != null) {
-         int titleIndex = cursor.getColumnIndex(FeedEntry.COLUMN_NAME_TITLE);
-         for (int i=0; i<cursor.getcount(); i++) {
-             cursor.moveToPosition(i);
-             String title = cursor.getString(titleIndex);
-         }
-         cursor.close()
-     }  
+    fun toList(title: String): List<Feed> {
+        val list = mutableListOf<Feed>()
+        val cursor = read(title)
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                val fTitle = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TITLE))
+                val fSubtitle = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SUBTITLE))
+                list.add(Feed(fTitle, fSubtitle))
+            }
+            cursor.close()
+        }
+        return list
+    }
 ]
 
 ---
@@ -424,31 +429,30 @@ Le mapping entre les tables (SQL) et les objets (Java) va se faire automatiqueme
 
 .remark-code[entités
 
-    @Entity
-    public class User {
-        @PrimaryKey
-        private int uid;
-        @ColumnInfo(name = "first_name")
-        private String firstName;
-    }
-]
+@Entity
+    data class User(
+        @PrimaryKey val uid: Int,
+        @ColumnInfo(name = "first_name") val firstName: String?,
+        @ColumnInfo(name = "last_name") val lastName: String?
+    )]
 .remark-code[DAO
 
     @Dao
-    public interface UserDao {
+    interface UserDao {
         @Query("SELECT * FROM user")
-        List<User> getAll();
+        fun getAll(): List<User>
+
         @Insert
-        void insertAll(User... users);
+        fun insertAll(vararg users: User)
+
         @Delete
-        void delete(User user);
-    }
-]
+        fun delete(user: User)
+    }]
 .remark-code[Database
 
-    @Database(entities = {User.class}, version = 1)
-    public abstract class AppDatabase extends RoomDatabase {
-        public abstract UserDao userDao();
+    @Database(entities = arrayOf(User::class), version = 1)
+    abstract class AppDatabase : RoomDatabase() {
+        abstract fun userDao(): UserDao
     }
 ]
 
@@ -477,10 +481,10 @@ Coté client, on utilise un service du système pour accéder aux données
 
 .remark-code[contentResolver example
 
-     ContentResolver contentResolver = getContentResolver();
-     Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-     Cursor cursor = contentResolver.query(uri, null, null, null, null);
-]
+    fun getMedia(context: Context): Cursor? {
+        val uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        return context.contentResolver.query(uri, null, null, null, null)
+    }]
 
 ---
 ## Coté fournisseur de contenu
@@ -530,10 +534,11 @@ On récupère les manager en utilisant un context:
 
 .remark-code[get manager
 
-    LocationManager mgr = 
-        (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+    fun getLocationManager(context: Context): LocationManager =
+        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-]
+    fun getLocationManager2(context: Context): LocationManager =
+        context.getSystemService(LocationManager::class.java)]
 
 ---
 ## Les Capteurs
@@ -543,9 +548,9 @@ Toutes les données des capteurs sont remontées aux applications via des Sensor
 On utilise le service du système : SensorManager
 .remark-code[SensorManager 
 
-     SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-     Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-]
+    fun getAccelerometer(context: Context): Sensor = context
+        .getSystemService(SensorManager::class.java)
+        .getDefaultSensor(Sensor.TYPE_ACCELEROMETER)]
 
 Pricipaux type de sensor
 - TYPE_GRAVITY
@@ -565,29 +570,42 @@ Pricipaux type de sensor
 On enregistre un listener pour recevoir les données du sensor
 
 .remark-code[Sensor
+		
+    override fun onResume() {
+        super.onResume()
+        sensorManager.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(listener)
+    }]
 
-     protected void onResume() {
-         super.onResume();
-         mSensorManager.registerListener(mListener, mAccelerometer, 
-              SensorManager.SENSOR_DELAY_NORMAL);
-     }
+.green[ne pas oublier de dé-enregistrer le listener]
 
-     protected void onPause() {
-         super.onPause();
-         mSensorManager.unregisterListener(mListener);
-     }
-]
+Les sensors envoient énormemement de données vers les applications, avec potentiellement une grosse consommation de la batterie.
+		
+		
+---
+## Le listener du sensor
 
-.green[ne pas oublier de déenregistrer le listener]
+L'interface des sensor n'est pas standard, les données sont remontées dans un tableau (voir la doc pour chaque type de sensor)
 
+"A priori", c'est homogène sur l'ensemble du parc de device... 
+		
 .remark-code[ listener
 
-     public void onSensorChanged(SensorEvent event) {
-         long when = event.timestamp;
-         float xAcc = event.values[0];
-         float yAcc = event.values[1];
-         float zAcc = event.values[2];
-     }]
+    object listener : SensorEventListener {
+      override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+          /* adapt to new accuracy */
+      }
+
+      override fun onSensorChanged(event: SensorEvent) {
+          val timestamp = event.timestamp
+          val xAcc = event.values[0]
+          val yAcc = event.values[1]
+          val zAcc = event.values[2]
+      }
+    }]
 
 
 ---
@@ -610,27 +628,29 @@ La localisation d'un terminal peut se faire de differentes façons
 
 .remark-code[LocationManager
 
+    class LocationHelper(val context: Context) {
 
-    // Acquire a reference to the system Location Manager
-    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        val locationManager = context.getSystemService(LocationManager::class.java)
 
-    // Define a listener that responds to location updates
-    LocationListener locationListener = new LocationListener() {
-         public void onLocationChanged(Location location) {
-         // Called when a new location is found by the network location provider.
-             makeUseOfNewLocation(location);
-         }
+        object listener: LocationListener {
+            override fun onLocationChanged(location: Location) {
+               /* use location */
+            }
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle?) { }
+            override fun onProviderEnabled(provider: String) { }
+            override fun onProviderDisabled(provider: String) { }
+        }
 
-         public void onStatusChanged(String provider, int status, Bundle extras) {}
+        fun register() {
+            if (checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 1f, listener)
+            } else { // ask the user to grant the location permission }
+        }
 
-         public void onProviderEnabled(String provider) {}
-
-         public void onProviderDisabled(String provider) {}
-    };
-
-    // Register the listener with the Location Manager to receive location updates
-    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-]
+        fun unregister() {
+            locationManager.removeUpdates(listener)
+        }
+    }]
 
 ---
 template: inverse
@@ -647,18 +667,19 @@ nécessite la permission .remark-code[android.permission.INTERNET]
 
 .remark-code[HttpUrlConnection
 
-        URL url = new URL(myurl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(10000 /* milliseconds */);
-        conn.setConnectTimeout(15000 /* milliseconds */);
-        conn.setRequestMethod("GET");
-        conn.setDoInput(true);
-        // Starts the query
-        conn.connect();
-        int response = conn.getResponseCode();
-        Log.d(DEBUG_TAG, "The response is: " + response);
-        is = conn.getInputStream();
-]
+    fun requestUrl(myUrl: String): InputStream {
+        val url = URL(myUrl)
+        val conn = url.openConnection() as HttpURLConnection
+        conn.apply {
+            readTimeout = 10000
+            connectTimeout = 15000
+            requestMethod = "GET"
+            doInput = true
+        }
+        conn.connect()
+        Log.d("requestUrl", "responseCode : ${conn.responseCode}")
+        return conn.inputStream
+    }]
 
 indépendant de la librairie sous jacente (Apache, OkHttp depuis 6.0) 
 
@@ -671,30 +692,19 @@ indépendant de la librairie sous jacente (Apache, OkHttp depuis 6.0)
 
 librairie externe poussée par Google
 
-ajouter .remark-code[compile 'com.android.volley:volley:1.0.19'] dans les dépendances du projet 
+ajouter .remark-code[implementation 'com.android.volley:volley:1.1.0'] dans les dépendances du projet 
 
 .remark-code[Volley
 
-    RequestQueue queue = Volley.newRequestQueue(this);
-    String url ="http://www.google.com";
-
-    // Request a string response from the provided URL.
-    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-            new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                 // Display the first 500 characters of the response string.
-                 mTextView.setText("Response is: "+ response.substring(0,500));
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                 mTextView.setText("That didn't work!");
-            }
-        });
-    // Add the request to the RequestQueue.
-    queue.add(stringRequest);
-]
+    @MainThread
+    fun requestUrl(context: Context, myUrl: String) {
+        val queue = Volley.newRequestQueue(context)
+        val stringRequest = StringRequest(Request.Method.GET, myUrl,
+            { response -> display(response.substring(0,500)) },
+            { error -> handleError(error) }
+        )
+        queue.add(stringRequest)
+    }]
 
 ---
 ## parser la réponse : exemple Json
@@ -703,43 +713,42 @@ On utilise l'objet .remark-code[JSONTokener] qui nous revoit soit un .remark-cod
 
 .remark-code[JSONTokener exemple
 
-     String json = "{"
-         + "  \"query\": \"Pizza\", "
-         + "  \"locations\": [ 94043, 90210 ] "
-         + "}";
+    val json = """{
+     "query": "Pizza", 
+     "locations": [ 94043, 90210 ] 
+     }"""
 
-     JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
-     String query = object.getString("query");
-     JSONArray locations = object.getJSONArray("locations");
-]
+    data class Data(val query:String, val locations: Array<Int>)
+
+    fun parseJson(): Data {
+        val obj = JSONTokener(json).nextValue() as JSONObject
+        val query = obj.getString("query")
+        val locJson = obj.getJSONArray("locations")
+        val locations = Array<Int>(locJson.length()) { locJson.getInt(it) }
+        return Data(query, locations)
+    }]
 
 ---
 ## parser la réponse : Gson la magie des anotations
 
 On utilise la librairie Gson 
 
-ajouter .remark-code[compile 'com.google.code.gson:gson:2.7'] dans les dépendances du projet 
+ajouter .remark-code[implementation 'com.google.code.gson:gson:2.7'] dans les dépendances du projet 
 
 .remark-code[JSONTokener exemple
 
-     String json = "{"
-         + "  \"query\": \"Pizza\", "
-         + "  \"locations\": [ 94043, 90210 ] "
-         + "}";
+    val json = """{
+    "query": "Pizza", 
+    "locations": [ 94043, 90210 ] 
+    }"""
 
-     class Data {
+    data class Data(val query:String, val locations: Array<Int>)
 
-         @SerializedName{"query"}
-         public String type
-    
-         @SerializedName("locations")
-         public int locs[];
-     }
-
-     Gson gson = new Gson();
-     Reader reader = new StringReader(json);
-     Data data = gson.fromJson(reader, Data.class);
-]
+    fun parseGson(): Data {
+        val gson = Gson()
+        val reader = StringReader(json)
+        return gson.fromJson(reader, Data::class.java)
+    }]
 
 
 
@@ -758,7 +767,7 @@ template: inverse
     <script>
       var slideshow = remark.create({
           highlightStyle: 'default',
-          highlightLanguage: 'java',
+          highlightLanguage: 'kotlin',
           highlightLines: true
         }) ;
     </script>

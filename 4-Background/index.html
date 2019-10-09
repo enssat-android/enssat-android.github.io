@@ -125,7 +125,7 @@ class: center, middle, inverse
 # Android Background
 
 ENSSAT
-2018-2019
+2019-2020
 
 Guillaume Châtelet
 
@@ -166,22 +166,20 @@ Il faut faire tourner les tâches longues en tâche de fond
 ---
 ## Thread
 
-Api standard Java
+Api standard
 
 .remark-code[Thread
 
-    final int loop = 5;
-    Thread t = new Thread(new Runnable() {
-
-         @Overide
-         public void run() {
-              for (int i=0; i<loop; i++) {
-                   // do incredibly long task
-                   ...
+        fun launch() {
+          val loop = 5
+          
+          val t = Thread { 
+              for (i in 0..loop) {
+                  // do incredibely long computations
               }
-         }
-    });
-    t.start();
+          }
+          t.start()
+        }
 ]
 
 les variables internes doivent être finale.
@@ -201,98 +199,78 @@ On peut demander un traitement immédiat ou dans le futur
 Chaque .remark-code[View] contient un .remark-code[Handler]
 
 ```
-Handler handler = textView.getHandler();
-
-handler.post(new Runnable() {
-    @Overide
-    public void run() {
-         textview.setText(result); 
-    }
-}
-```
-
-On peut aussi créer un Handler dans une .remark-code[Activity], il pourra modifier l'UI.
-
-```
-class MyActivity extends Activity {
+val handler = textView.handler
     
-    Handler handler = new Handler();
+fun setText(text: String) {
+    handler.post { textView.text = text }
+}
+```
+
+On peut aussi créer un .remark-code[Handler] dans une .remark-code[Activity], il pourra modifier l'UI.
+
+```
+class MyActivity: Activity {
+    
+    val handler = Handler()
 
     ...
 }
 ```
-
----
-
-```
-public class AppExecutors {
-    ...
-    private static AppExecutors sInstance;
-    private final Executor diskIO,mainThread,networkIO;
-
-    private AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
-        this.diskIO = diskIO;
-        ...
-    }
-
-    public static AppExecutors getInstance() {
-      if (sInstance == null) {
-          synchronized(LOCK){
-              sInstance = new AppExecutors(Executors.newSingleThreadExecutor(),
-                        Executors.newFixedThreadPool(3),
-                        new MainThreadExecutor());
-          }
-      }
-      return sInstance;
-    }
-
-    public Executor diskIO() { return diskIO; }
-
-    public Executor mainThread() { return mainThread; }
-
-    public Executor networkIO() { return networkIO; }
-
-    private static class MainThreadExecutor implements Executor {
-        private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-
-        @Override
-        public void execute(@NonNull Runnable command) {
-            mainThreadHandler.post(command);
-        }
-    }
-```
-
 ---
 ## AsyncTask
 
 Android fournit les .remark-code[AsyncTask] pour interagir avec l'UI pendant la tâche de fond.
 
 ```
-    class AsyncCreateString extends AsyncTask<Long, Integer, String> {
+class AsyncCreateString: AsyncTask<Long, Int, String>() {
+        
+  @WorkerThread override fun doInBackground(vararg params: Long?): String {
+      var result = ""
+      var progress = 0
+      // loop to create result
+         publishProgress(progress)
+      // end loop
+      return result
+  }
 
-        @Override
-        protected String doInBackground(Long... seed) {
-            String result = null;
-            // loop to create result 
-                publishProgress(progress)
-            // end loop
-            return result;
-        }
+  @UiThread override fun onProgressUpdate(vararg values: Int?) {
+      super.onProgressUpdate(*values)
+      // update UI with the values
+  }
 
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            // update UI with values[0] 
-        }
+  @UiThread override fun onPostExecute(result: String?) {
+      super.onPostExecute(result)
+      // update UI with the result
+  }
+}
+```
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            // update UI with the result s
-        }
-    }
+---
+## Executors
+
+Les implémentations actuelles utilisent plutôt un `AppExecutor` défini comme suit avec des `LiveData` pour mettre à jour l'UI
 
 ```
+object AppExecutor {
+
+  val diskIO = Executors.newSingleThreadExecutor()
+  val networkIO = Executors.newFixedThreadPool(3)
+  val mainThread = object: Executor {
+      val handler = Handler(Looper.getMainLooper())
+
+      override fun execute(command: Runnable) {
+          handler.post(command)
+      }
+  }
+}
+
+fun usage() {
+  AppExecutor.diskIO.execute { readFile() }
+  AppExecutor.mainThread.execute { updateUI() }
+  AppExecutor.networkIO.execute { requestData() }
+}
+```
+
 
 ---
 template: inverse
@@ -303,22 +281,21 @@ template: inverse
 ---
 ## Les Services Android
 
-Les services sont des moyens d'exposer une interface à l'ensemble d'une application, voir même aux applications externes
-
 Comme des .remark-code[Activity] (mais sans UI), les services :
 - ont un cycle de vie dicté par le système 
-
 - doivent être déclarés dans le Manifest de l'application
 
+Trois types de services
+- Connecté (bound) pour intéragir avec une activité
+- En avant (foreground) pour effectuer une tâche qui a un impact sur l'utilisateur (jouer de la musique)
+- Tâche de fond (background) pour effectuer une tâche sans UI (compactage de donnée) (tend à disparaître)
 
 On les utilise: 
-- pour fournir une functionalité : par exemple, Service de voix sur IP
-
+- pour fournir une fonctionalité : par exemple, Service de voix sur IP
 - pour accéder à un traitement en tâche de fond : par exemple, Service qui joue de la musique, Service de navigation, Service de comptage de pas
 
 
-.green[une Service n'est pas un Thread, les traitements long doivent se faire dans un worker Thread]
-
+.green[Un Service n'est pas un Thread, les traitements long doivent se faire dans un worker Thread]
 ---
 ## Invoquer un Service
 
@@ -328,9 +305,7 @@ Deux manières d'invoquer un .remark-code[Service] :
 
 L'UI s'attache au .remark-code[Service] qui se créé à la demande
 
-```
-context.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-```
+`context.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)`
 
 Quand plus aucun _client_ n'est connecté, le .remark-code[Service] s'arrête 
 
@@ -338,40 +313,36 @@ Quand plus aucun _client_ n'est connecté, le .remark-code[Service] s'arrête
 
 L'UI démarre le .remark-code[Service] explicitement 
 
-```
-context.startService(intent);
-```
+`val intent1 = Intent(ctxt, ExampleService.class);
+context.startService(intent)`
 
 qui s'arrêtera quand l'UI appele la commande 
 
-```
-context.stopService(intent);
-```
+`context.stopService(intent)`
 
 ---
+## Service Foreground
 
-## Invoquer un Service
+Les services background tendent à disparaître, remplacés par le `WorkManager`.
 
-Un service est invoqué avec un Intent:
-- explicite
-```
-Intent intent1 = new Intent(ctxt, ExampleService.class);
-Intent intent2 = new Intent(); 
-intent2.setPackageName("fr.enssat.android"); 
-intent2.setAction("fr.enssat.android.action.CUSTOM_ACTION");
-```
+Reste les foreground qui perdurent même si l'utilisateur "arrête" l'application (exemple: Jouer de la musique)
+ 
 
-- implicite
-```
-Intent intent = new Intent(); 
-intent.setAction(ACTION_CUSTOM); 
-intent.addCategory(CATEGORY_CUSTOM)
-```
-.green[Depuis Android 5, pour des raisons de securité, il n'est plus possible de démarrer un .remark-code[Service] avec un intent implicite]
+Details : 
+
+- Les services foreground sont lancés en utilisant
+
+`context.startForegroundService(intent: Intent)`
+
+- Pour ne pas être dans l'illégalité, un service foreground devra afficher une notification dans les 5 secondes après son lancement
+
+`startServiceForeground(id: Int, notification: Notification)`
+
+
 ---
 ## Déclarer un service
 
-```
+```xml
 <permission
   android:name="fr.enssat.android.permission.CUSTOM_PERM"
   android:protectionLevel="signature"/>
@@ -380,7 +351,7 @@ intent.addCategory(CATEGORY_CUSTOM)
   android:name=".ExampleService"
   android:description="sera affiché à l'utilisateur"
   android:permission="fr.enssat.android.permission.CUSTOM_PERM"> 
-  <intent-filter><!-- plus nécessaire depuis Android 5-->
+  <intent-filter>
     <action android:name="fr.enssat.android.action.CUSTOM_ACTION" /> 
     <category android:name="fr.enssat.android.category.CUSTOM_CATEGORY" />
   </intent-filter> 
@@ -407,20 +378,28 @@ Au moment du .remark-code[onBind], le service envoie au client un .remark-code[B
 Le client le reçoit dans la *callback* du .remark-code[ServiceConnection] passer au moment du .remark-code[bindService]  
 
 ```
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-             mService = getService(iBinder);
-        }
+var service: IMyAidlInterface? = null
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-             mSercive = null;
-        }
-    };
+val conn = object: ServiceConnection {
+    override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+        service = IMyAidlInterface.Stub.asInterface(binder)
+    }
 
+    override fun onServiceDisconnected(name: ComponentName?) {
+        service = null
+    }
+}
 ```
 
+Coté service le `IBinder` est fourni en implémentant la méthode
+
+```
+override fun onBind(intent: Intent?): IBinder? {
+  return object: IMyAidlInterface.Stub() {
+      ...
+  }
+}
+```
 
 
 ---
@@ -466,23 +445,19 @@ interface IMyAidlInterface {
 ---
 ## IntentService
 
-C'est un mix entre un Service et un Thread
+C'est un service light qui ne peut être connecté
 
-On envoie un .remark-code[Intent] à l'.remark-code[IntentService] qui démarre un Thread pour traiter la demande
+On envoie un .remark-code[Intent] à l'.remark-code[IntentService] qui va traiter la demande
+Si le traitement est long, il faut lancer un Thread
+
+.green[Attention, si le traitement dépasse le temps d'utilisation de l'UI, c'est un foreground Service]
 
 ```
-public class MyIntentService extends IntentService {
-
-
-    public MyIntentService() {
-        super("MyIntentServiceThread");
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        // Process the Intent in the Thread  
-    }
-
+class TestIntentService: IntentService("TestIntentService") {
+    
+  override fun onHandleIntent(intent: Intent?) {
+      // process the intent
+  }
 }
 ``` 
 
@@ -498,12 +473,11 @@ template: inverse
 Les .remark-code[BroadcastReceiver] permettent de recevoir des .remark-code[Intent] envoyé à l'ensemble des _receivers_.
 
 ```
-public class MyBroadcastReceiver extends BroadcastReceiver {
+class MyBroadcastReceiver: BroadcastReceiver() {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // Handle the Intent  
-    }
+  override fun onReceive(context: Context?, intent: Intent?) {
+      // process the Intent
+  }
 
 }
 ```
@@ -521,12 +495,12 @@ context.sendOrderedBroadcast(Intent intent);
 ---
 ## Enregister un BroadcastReceiver
 
-Soit dans le Manifest
+Soit dans le Manifest (de moins en moins permis)
 
 ```
         <receiver android:name=".MyBroadcastReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.NETWORK_STATE_CHANGED_ACTION" />
             </intent-filter>
         </receiver>
 ```
@@ -534,21 +508,21 @@ Soit dans le Manifest
 Soit dans dynamiquement dans le code
 
 ```
-    public void register(Context context) {
-        if (myBroadcastReceiver != null) 
-             throws new IllegalStateException("receiver already registered");
-        myBroadcastReceiver = new MyBroadcastReceiver();
-        IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-        context.registerReceiver(myBroadcastReceiver, filter);
-    }
-    
-    public void unregister(Context context) {
-        context.unregisterReceiver(myBroadcastReceiver);
-        myBroadcastReceiver = null;
-    }
+companion object {
+  val receiver = MyBroadcastReceiver()
+
+  fun register(context: Context) {
+      val filter = IntentFilter(Intent.ACTION_MEDIA_BUTTON)
+      context.registerReceiver(receiver, filter)
+  }
+  
+  fun unregister(context: Context) {
+      context.unregisterReceiver(receiver)
+  }
+}
 ```
 
-
+.green[pensez en dé-enregistrer !]
 
 
 ---
@@ -559,15 +533,20 @@ template: inverse
 ## JobScheduler
 
 Fournit une API qui permet de planifier des tâches à réaliser en background.
+Alternative aux services en background
 
 ```
-serviceComponent = new ComponentName(this, MyJobService.class);
-JobInfo.Builder builder = new JobInfo.Builder(id, serviceComponent);
-builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
-builder.setRequiresCharging(true)
+fun register(context: Context, params: PersistableBundle) {
+  val myJobComponent = ComponentName(context, MyJobService::class.java)
+  val jobInfo = JobInfo.Builder(MyJobService.MY_JOB_ID, myJobComponent).apply {
+      setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+      setRequiresCharging(true)
+      setExtras(params)
+  }.build()
 
-JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-tm.schedule(builder.build());
+  val scheduler = context.getSystemService(JobScheduler::class.java)
+  scheduler.schedule(jobInfo)
+}
 ```
 
 Il simplifie beaucoup l'expression des conditions nécessaires à l'execution du Job
@@ -579,7 +558,7 @@ des Job définis par chacune des applications.
 ## JobScheduler
 
 Déclaration dans le Manifest
-```
+```xml
 <service
     android:name=".service.MyJobService"
     android:permission="android.permission.BIND_JOB_SERVICE"
@@ -588,18 +567,19 @@ Déclaration dans le Manifest
 
 MyJobService.java
 ```
-public class MyJobService extends JobService {
+class MyJobService: JobService() {
 
-  @Override
-  public boolean onStartJob(final JobParameters params) {
+  override fun onStartJob(params: JobParameters?): Boolean {
+      return true
   }
 
-  @Override
-  public boolean onStopJob(JobParameters params) {
+  override fun onStopJob(params: JobParameters?): Boolean {
+      return true
   }
-}
 
-public abstract class JobService extends Service {
+  companion object {
+       val MY_JOB_ID = 100101
+  }
 }
 ```
 ---
@@ -652,7 +632,7 @@ template: inverse
     <script>
       var slideshow = remark.create({
           highlightStyle: 'default',
-          highlightLanguage: 'java',
+          highlightLanguage: 'kotlin',
           highlightLines: true
         }) ;
     </script>

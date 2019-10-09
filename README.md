@@ -15,11 +15,11 @@
 
 ### TP-2
 
-[Dialog, Toast, Snackbar, Menu](https://enssat-android.github.io/TP2)
+[ViewModel, LiveData](https://codelabs.developers.google.com/codelabs/kotlin-android-training-view-model)
 
 ### TP-3
 
-[Advanced IHM](https://enssat-android.github.io/TP3)
+[RecyclerView](https://codelabs.developers.google.com/codelabs/kotlin-android-training-recyclerview-fundamentals)
 
 ### TP-4
 

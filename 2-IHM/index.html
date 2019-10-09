@@ -275,7 +275,7 @@ Les layouts sont décrits en XML dans les ressources :
 
 - zone d'écran pour aligner des vues dans des tables ou des grilles (peu utilisées dans les faits)
 
-### RelativeLayout
+### ConstrainedLayout (RelativeLayout deprecated) 
 
 - zone d'écran pour aligner des vues les unes par rapport aux autres
 
@@ -609,7 +609,7 @@ Possiblité de récupérer les pointeurs sur les objets créé par un Layout dan
 
 LiveData encapsule une donnée
 
-On peut enregistrer des obeserveurs qui sont appelé quand la donnée est modifiée
+On peut enregistrer des observeurs qui sont appelés quand la donnée est modifiée
 
 .remark-code[ myLiveData.postValue(value);]
 
@@ -617,7 +617,7 @@ On peut enregistrer des obeserveurs qui sont appelé quand la donnée est modifi
 
 .remark-code[ myLiveData.observe(component, callBack);]
 
-les callbacks ne sont enregistré que pour la durée de vie des conposants associés pour éviter les mémory leaks
+les callbacks ne sont enregistrées que pour la durée de vie des composants associés pour éviter les memory-leaks
 
 
 ---

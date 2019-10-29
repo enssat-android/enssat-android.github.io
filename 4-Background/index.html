@@ -175,23 +175,23 @@ Api standard
           
           val t = Thread { 
               for (i in 0..loop) {
-                  // do incredibely long computations
+                  // do incredibly long computations
               }
           }
           t.start()
         }
 ]
 
-les variables internes doivent être finale.
+les variables internes doivent être finales.
 
 l'accès aux paramètres de la classe est possible 
 
-.green[attention aux accès concurents]
+.green[attention aux accès concurrents]
 
 ---
 ## Handler
 
-Les Handler permettent de gérer des messsages ou d'exécuter des Runnable dans le Thread où ils ont été créés.
+Les Handler permettent de gérer des messsages ou d'exécuter des Runnables dans le Thread où ils ont été créé.
 
 On peut demander un traitement immédiat ou dans le futur
 
@@ -470,7 +470,7 @@ template: inverse
 ---
 ## BroadcastReceiver
 
-Les .remark-code[BroadcastReceiver] permettent de recevoir des .remark-code[Intent] envoyé à l'ensemble des _receivers_.
+Les .remark-code[BroadcastReceiver] permettent de recevoir des .remark-code[Intent] envoyés à l'ensemble des _receivers_.
 
 ```
 class MyBroadcastReceiver: BroadcastReceiver() {
@@ -522,7 +522,7 @@ companion object {
 }
 ```
 
-.green[pensez en dé-enregistrer !]
+.green[pensez à dé-enregistrer !]
 
 
 ---
@@ -587,12 +587,12 @@ template: inverse
 # WorkManager
 ---
 ## WorkManager
-.remark-code[WorkManager] a été introduit récemment et fait partie de androidx.
+.remark-code[WorkManager] a été introduit récemment et fait partie de androidX.
 Cette API s'appuie sur le .remark-code[JobScheduler], Firebase JobDispatcher ou .remark-code[AlarmManager] en fonction du contexte.
 
 Elle inclut:
 - .remark-code[Worker]: class abstraite dont on hérite pour définir la tâche à réaliser.
-- .remark-code[WorkerRequest]: une tâche désignant un Worker qui doit s'éxécuter. Elle peut préciser des conditions préalable
+- .remark-code[WorkerRequest]: une tâche désignant un Worker qui doit s'éxécuter. Elle peut préciser des conditions préalables
 à l'execution (à l'image du JobScheduler). 
 - .remark-code[WorkManager]: planifie l'execution des WorkerRequest en optimisant l'usage des resources système et garantissant 
 les conditions nécessaires à leur execution.  

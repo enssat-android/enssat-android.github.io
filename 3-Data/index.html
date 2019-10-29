@@ -222,7 +222,7 @@ Passer de gros volumes de données dans des Intents est difficile.
 ---
 ## Singleton
 
-Pour faire une interface pour gérer les donnée
+Pour faire une interface pour gérer les données
 
 On peut créer des .remark-code[Singletons] pour contenir les données
 ```kotlin
@@ -249,7 +249,7 @@ Pas besoin de `getInstance()`, en Kotlin, on appelle directement `MySingleton.ge
 template: inverse
 # Shared Preferences
 
-"Je préfère partagé"
+"Je préfère partager"
 
 ---
 ## Shared Preferences
@@ -277,7 +277,7 @@ Possibilité de générer une interface (type Settings du téléphone) pour modi
     }
 ]
 
-.green[suivant le .remark-code[Context], les shared preferences peuvent etre associé à une activité ou à l'application]
+.green[suivant le .remark-code[Context], les shared preferences peuvent etre associées à une activité ou à l'application]
 
 
 ---
@@ -316,7 +316,7 @@ template: inverse
 ---
 ## Base de données
 
-Android contient la librairie SQLite qui permet de gérer des base de données
+Android contient la librairie SQLite qui permet de gérer des bases de données
 
 .remark-code[SQLiteOpenHelper 
 
@@ -460,7 +460,7 @@ Le mapping entre les tables (SQL) et les objets (Java) va se faire automatiqueme
 template: inverse
 # Content Provider
 
-"Partagé les données pour éviter des les recopier"
+"Partager les données pour éviter de les recopier"
 
 ---
 ## Content Provider
@@ -496,7 +496,7 @@ Implementer le ContentProvider :
 - Parser les Uris 
  - fr.enssat.myapp.mydata : toutes les données
  - fr.enssat.myapp.mydata/ID : seulement la donnée avec l'id ID
- - fr.enssat.myapp.mydata/text : seulemenet les données texte
+ - fr.enssat.myapp.mydata/text : seulement les données texte
  - ...
 
 - Implementer les commandes query, insert, update, delete
@@ -519,18 +519,18 @@ template: inverse
 Plusieurs managers permettent d'accéder aux données du terminal
 
 - SensorManager : les données des capteurs
-- LocationManager : permet d'accèder à la localistaion du terminal
+- LocationManager : permet d'accèder à la localisation du terminal
 - TelephonyManager : tout ce qui touche à la téléphonie
-- SmsMananger : permet d'envoyer des SMS
+- SmsManager : permet d'envoyer des SMS
 - ClipBoardMananger : copie colle manager
-- PackageManager : applications installé sur le terminal
+- PackageManager : applications installées sur le terminal
 - PowerManager : la batterie
 - NFCManager : le  NFC
 - BlueToothManager: le bluetooth
 - WifiManager : le Wifi
 
 
-On récupère les manager en utilisant un context:
+On récupère les managers en utilisant un context:
 
 .remark-code[get manager
 
@@ -612,12 +612,12 @@ L'interface des sensor n'est pas standard, les données sont remontées dans un 
 ## La localisation
 
 La localisation d'un terminal peut se faire de differentes façons
-- Le réseau GSM : permet la localisation du terminal en estimant la distance au antennes GSM vues par le terminal 
+- Le réseau GSM : permet la localisation du terminal en estimant la distance aux antennes GSM vues par le terminal 
  - biais car le signal peut etre atténué ou emplifié
 - Les bornes Wifi : Google connait la localisation des bornes Wifi 
  - sauf quand elles bougent
 - Le GPS : fournie une localisation sure du terminal
- - par satélite
+ - par satellite
  - couteuse en énergie 
  - amélioration du temps de localisation grace au aGPS (réseau)
 
@@ -656,7 +656,7 @@ La localisation d'un terminal peut se faire de differentes façons
 template: inverse
 # Données distantes
 
-"Il faut resté connecté"
+"Il faut rester connecté"
 
 ---
 ## Requête http
@@ -709,7 +709,7 @@ ajouter .remark-code[implementation 'com.android.volley:volley:1.1.0'] dans les 
 ---
 ## parser la réponse : exemple Json
 
-On utilise l'objet .remark-code[JSONTokener] qui nous revoit soit un .remark-code[JSONObejct] soit un .remark-code[JSONArray]
+On utilise l'objet .remark-code[JSONTokener] qui nous renvoie soit un .remark-code[JSONObejct] soit un .remark-code[JSONArray]
 
 .remark-code[JSONTokener exemple
 

@@ -217,7 +217,7 @@ Coder une activité revient à coder les actions à faire quand le système stim
 
 Les callbacks sont appelés par le système, elles sont exécutés dans le thread de l'UI
 
-Aucun traitement long ne doit se faire dans ces méthodes sous peine de blocage de l'IU
+Aucun traitement long ne doit se faire dans ces méthodes sous peine de blocage de l'UI
 
 Quelques traitements long :
 - accès disque
@@ -314,7 +314,7 @@ Peuvent réagir aux interaction utilisateur
 ]
 
 .left-column[
-Dimension d'indépendante de la résolution 
+Dimension indépendante de la résolution 
 - .remark-code[dp] : pour les distances 
 - .remark-code[sp] : pour les tailles de police
 - .remark-code[match_parent|wrap_content] : relatives
@@ -350,9 +350,9 @@ Dans le code, on peut :
 
 - retrouver les objets java créés
 - modifier dynamiquement des attributs en utilisant les objets
-- enregistrer des callback pour les actions utilisateurs
+- enregistrer des callbacks pour les actions utilisateurs
 
-Point Jetpack : on peut même maintenant déclarer des objets dans le XML comme porteurs des données à afficher. Modifier les valuers dans de cet objet dans le code modifie automatiquement l'affichage.
+Point Jetpack : on peut même maintenant déclarer des objets dans le XML comme porteurs des données à afficher. Modifier les valeurs dans de cet objet dans le code modifie automatiquement l'affichage.
 
 Attention au nombre de mise à jour de l'affichage que cela peut induire.
 
@@ -642,7 +642,7 @@ Très utile pour séparer définitivement l'UI des données
 template: inverse
 # Morceau d'IHM
 
-"Quand le design se lache, une seule solution, découper pour mieux reigner"
+"Quand le design se lache, une seule solution, découper pour mieux régner"
 
 ---
 ## Fragment
@@ -670,7 +670,7 @@ La classe est une extension d'un Layout (Linear, Constraint)
 - Soit on l'utilise dans le XML
 - Soit on inflate un layout XML dans le code
 
-Ensuite la classe et le code est réutilisable dans d'autres layout et on mutualise le code 
+Ensuite la classe et le code sont réutilisables dans d'autres layout, on mutualise le code 
 
   
 

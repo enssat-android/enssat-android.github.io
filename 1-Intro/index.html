@@ -125,7 +125,7 @@ class: center, middle, inverse
 # Android Introduction
 
 ENSSAT
-2021-2022
+2022-2023
 
 Guillaume Châtelet
 Pierre Crépieux
@@ -195,6 +195,7 @@ Mais aussi:
 - montre connectée
 - télévision connectée
 - voiture connectée
+- IOT (Internet of Things)
 
 ---
 ## Fonctionnalités et services de plus en plus étendues
@@ -204,7 +205,7 @@ Mais aussi:
 - premier service USSD
 - WAP
 - Appareil photo
-- Internet 3G/4G
+- Internet 3G/4G/5G
 - Musique : convergence Ipod - téléphone 
 - GPS : Navigation
 - NFC : Paiement
@@ -525,7 +526,7 @@ matériel.
 
 .left-column[
 <table border="2" cellPadding="4">
-<tr><th>n° </th><th width="80%"> Nom     </th><th>Sortie</th><th>Api </th></tr>
+<tr><th>n° </th><th width="50%"> Nom     </th><th>Sortie</th><th>Api </th></tr>
 <tr><td>1.0</td><td>                     </td><td>09/08 </td><td>1   </td></tr>
 <tr><td>1.1</td><td> Petit four          </td><td>03/09 </td><td>2   </td></tr>
 <tr><td>1.5</td><td> Cupcake             </td><td>04/09 </td><td>3   </td></tr>
@@ -538,14 +539,14 @@ matériel.
 <tr><td>3.2</td><td> Honeycomb MR2       </td><td>07/11 </td><td>13  </td></tr>
 <tr><td>4.0</td><td> Ice Scream S.       </td><td>10/11 </td><td>14-15</td></tr>
 <tr><td>4.1</td><td> Jelly bean        </td><td>07/12 </td><td>16   </td></tr>
+<tr><td>4.2</td><td> Jelly bean MR1    </td><td>11/12 </td><td>17   </td></tr>
+<tr><td>4.3</td><td> Jelly bean MR2    </td><td>05/13 </td><td>18   </td></tr>
 </table>
 ]
 
 .right-column[
 <table border="2" cellPadding="4">
-<th>n° </th><th width="80%"> Nom       </th><th>Sortie</th><th>Api  </th></tr>
-<tr><td>4.2</td><td> Jelly bean MR1    </td><td>11/12 </td><td>17   </td></tr>
-<tr><td>4.3</td><td> Jelly bean MR2    </td><td>05/13 </td><td>18   </td></tr>
+<th>n° </th><th width="50%"> Nom       </th><th>Sortie</th><th>Api  </th></tr>
 <tr><td>4.4</td><td> Kitkat            </td><td>11/13 </td><td>19-20</td></tr>
 <tr><td>5.0</td><td> Lolipop           </td><td>10/14 </td><td>21-22</td></tr>
 <tr><td>6.0</td><td> MarshMallow       </td><td>10/15 </td><td>23   </td></tr>
@@ -556,6 +557,7 @@ matériel.
 <tr><td>10 </td><td> Android 10        </td><td>09/19 </td><td>29   </td></tr>
 <tr><td>11 </td><td> Android 11        </td><td>09/20 </td><td>30   </td></tr>
 <tr><td>12 </td><td> Android 12        </td><td>09/21 </td><td>31   </td></tr>
+<tr><td>13 </td><td> Android 13        </td><td>09/22 </td><td>32   </td></tr>
 </table>
 ]
 
@@ -579,17 +581,18 @@ fragmentation.
 - 9.0 amélioration ergonomie (E2E screen, notifications)
 - 10.0 sécurisation des données privés utilisateurs
 - 11.0 conversation "centric", fédération des devices connectés
+- 12.0 nouveau design
 
 Android Go : version pour device low-end
 
 ---
-## Repartition des versions ([Aout 2021](https://gs.statcounter.com/android-version-market-share/mobile-tablet/worldwide))
+## Repartition des versions ([Sept 2022](https://gs.statcounter.com/android-version-market-share/mobile-tablet/worldwide))
 
 # 
  
 
 <center>
-<img width="100%" src="img/chart-2021.png" />
+<img width="100%" src="img/chart-2022.png" />
 </center>
 
 ---
@@ -623,6 +626,23 @@ jour gratuitement des équipements anciens.
 utilisateurs.
 - Android Update Alliance : accords pour avoir une propagation
 rapide des versions.
+
+---
+## Google Mobile Services (GMS)
+Des services exclusifs qui ont l'air de faire partie de la plateforme
+
+  - Appli Google:
+    - Play store
+    - Gmail, Gmaps, Drive, etc...
+  
+  - APIs:
+    - Service de géolocalisation 
+    - Reconnaissance vocale
+    - Paiement NFC
+
+Seul les téléphones validés par Google ont le droit de sortir avec les GMS
+
+Et donc pas les téléphones pour la Chine (Huawei)
 
 ---
 template: inverse
@@ -809,7 +829,7 @@ développeurs.
 - https://play.android.com : vente des applications.
  
 <center>
-<img width="100%" src="img/android-site.png" />
+<img width="100%" src="img/android-site-2.png" />
 </center>
 
 ---
@@ -893,7 +913,7 @@ Permet de vérifier l'état des variables en cours d'exécution
 
 Logcat : lien direct entre les stack trace des exceptions et le code
 
-<img width="100%" src="img/android-monitor.png" />
+<img width="100%" src="img/android-monitor-2.png" />
 
 Mémoire, cpu, gpu, réseau :
 

@@ -631,6 +631,11 @@ template: inverse
     <script src="remark.language.js"></script>
     <script>
       var slideshow = remark.create({
+          ratio: '16:9',
+          navigation: {
+            touch: false,
+            scroll: false,
+          },
           highlightStyle: 'default',
           highlightLanguage: 'kotlin',
           highlightLines: true

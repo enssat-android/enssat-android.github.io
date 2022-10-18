@@ -7,6 +7,8 @@
 3. [Data](./3-Data/index.html)
 4. [Background](./4-Background/index.html)
 
+
+
 ## TPs
 
 ### TP-1
@@ -29,3 +31,18 @@
 
 [Background with Workmanager](https://codelabs.developers.google.com/codelabs/android-workmanager-kt)
 
+
+
+## Kotlin
+
+### Kotlin Bootcamp
+
+Les bases de Kotlin 
+
+[Kotlin bootcamp for Programmers](https://developer.android.com/courses/kotlin-bootcamp/overview)
+
+### Koan
+
+Tous les trucs et astuces Kotlin
+
+[Kotlin Koan](https://play.kotlinlang.org/koans/overview)

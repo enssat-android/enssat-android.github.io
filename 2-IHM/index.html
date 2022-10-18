@@ -635,7 +635,162 @@ Très utile pour séparer définitivement l'UI des données
 <img src="img/view-model.png" />
 ]
 
+---
+template: inverse
+# Compose
 
+"Easier, faster, funnier ! Jetpack Compose !" 
+
+---
+## Jetpack compose : La promesse
+
+.left-column[
+### Moins de code
+
+- Pas de XML
+
+- Pas de mise à jour de l'UI
+
+- Moins de bug
+
+### Intuitif
+
+- Le code décrit l'UI en fonction du `state` de l'appli
+
+- Quand le `state` change, l'UI change
+]
+
+.right-column[
+### Plus rapide
+
+- Live preview dans Android Studio
+
+    - voir live update sur le téléphone
+
+- Plus facile à tester et à modifier
+
+- Compatible avec les View/Layout 
+
+### Puissant
+
+- Full Material Design Complient
+
+- Theming
+
+- Animation
+]
+
+---
+## Dans la vrai vie, il faut :
+
+<br>
+.center[
+### - un projet avec du Kotlin
+### - un système de build recent
+### - un IDE recent
+### - accepter Material Design
+
+<br>
+### Que toute l'équipe soit d'accord
+]
+
+---
+## Mais :
+.left-column[
+.remark-code[ Example:
+
+    @Composable
+    fun JetPackCompose() {
+      Card {
+        var expanded by remember { mutableStateOf(false) }
+        Column(modifier.clickable { expanded = !expanded }) {
+          Image(painterRessource(R.drawable.jetpack_compose))
+          AnimaterVisibility(expanded) {
+            Text(
+              text = "Jetpack Compose",
+              style = MaterialTheme.typography.h2,
+            )
+          }
+        } 
+      }
+    }
+]
+]
+.right[<img src="img/landing-preview-animation.gif" height="500"/>]
+
+---
+## Layout
+
+.left-column[
+### Layouts simples
+
+- Par defaut: les uns sur les autres
+- Column
+- Row
+- Box
+
+<img src="img/layout-column-row-box.svg" width="80%"/>
+]
+
+.right-column[
+### Alignements
+- aligne les enfants
+
+### Modificateurs
+
+- `clickable` : reagit au click et fait apparaitre un ripple.
+- `padding` : rajoute de l'espace autour de l'élément.
+- `fillMaxWidth` : prend toute la largeur (existe aussi pour le `height`).
+- `size()` : fixe la taille de l'élement.
+- `align` : aligne dans le parent (dépend du parent)
+
+### Spacers
+- pour faire des trous 
+]
+
+---
+## Échafaud : Scaffold
+
+.left-column[
+Pour gérer : 
+- la TopAppBar 
+- la BottomAppBar
+- le FloatingActionButton
+- le BurgerMenu (drawer)
+
+.remark-code[ Scaffold:
+
+    @Composable
+    fun HomeScreen(/*...*/) {
+        Scaffold(
+            drawerContent = { /*...*/ },
+            topBar = { /*...*/ },
+            content = { /*...*/ }
+        )
+    }
+]
+]
+
+.right[<img src="img/modal_navigation_drawer.png" width="45%"/>]
+
+---
+## State
+
+L'UI ne changera qeu si l'état (`state`) change
+<center>
+<iframe width="840" height="480" src="https://www.youtube.com/embed/mymWGMy9pYI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+
+---
+## Material Design
+
+[M2](https://m2.material.io/design/introduction): Tout pour le bonheur de vos UX.
+
+[M3](https://m3.material.io/components): is coming.
+
+<center>
+<img src="img/material_components.png" width="80%" />
+</center>
 
 
 ---
@@ -834,6 +989,10 @@ template: inverse
     <script src="remark.language.js"></script>
     <script>
       var slideshow = remark.create({
+          ratio: '16:9',
+          navigation: {
+            scroll: false,
+          },
           highlightStyle: 'default',
           highlightLanguage: 'kotlin',
           highlightLines: true

@@ -13,21 +13,25 @@
 
 ### TP-1
 
-[Build Your First Android App in Kotlin](https://codelabs.developers.google.com/codelabs/build-your-first-android-app-kotlin)
+[Principe de base de Jetpack Compose](https://developer.android.com/codelabs/jetpack-compose-basics)
 
 ### TP-2
 
-[ViewModel, LiveData](https://codelabs.developers.google.com/codelabs/kotlin-android-training-view-model)
+[L'état dans Jetpack Compose](https://developer.android.com/codelabs/jetpack-compose-state)
 
 ### TP-3
 
-[RecyclerView](https://codelabs.developers.google.com/codelabs/kotlin-android-training-recyclerview-fundamentals)
+[Mises en page de base dans Compose](https://developer.android.com/codelabs/jetpack-compose-layouts)
 
 ### TP-4
 
-[Persistance with Room](https://codelabs.developers.google.com/codelabs/android-room-with-a-view-kotlin)
+[État avancé et effets secondaires dans Jetpack Compose](https://developer.android.com/codelabs/jetpack-compose-advanced-state-side-effects)
 
 ### TP-5
+
+[Persistance with Room](https://codelabs.developers.google.com/codelabs/android-room-with-a-view-kotlin)
+
+### TP-6
 
 [Background with Workmanager](https://codelabs.developers.google.com/codelabs/android-workmanager-kt)
 

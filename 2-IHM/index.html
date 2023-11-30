@@ -114,6 +114,9 @@
         height: 92%;
         float: right;
       }
+      .reduce {
+        width: 90%;
+      }
     </style>
   </head>
   <body>
@@ -747,6 +750,105 @@ template: inverse
 ### Spacers
 - pour faire des trous 
 ]
+
+---
+## Cycle de vie des Components
+
+<center>
+  <img src="img/lifecycle-composition.png" width="80%"/>
+
+</center>
+
+la recomposition est faite au changement d'état
+
+---
+## Effects
+
+lancer une coroutine quand changer l'état ne suffit plus, à manier avec parcimonie...
+
+.left-column[
+### LaunchEffect
+
+- Executé une fois au démarage
+- puis quand les `state` en argument changent
+- pas réexécuté à la recomposition
+- pas dans le thread de l'UI
+
+.reduce[
+.remark-code[ Example:
+
+    @Composable
+    fun optInWithTimeout(time : Int, onRespond: (FeelGood) -> Unit) {
+      var remain by remember { mutableStateOf(time) }
+
+      LaunchedEffect(true) {
+        repeat(time) { delay(1000); remain-- }
+        onRespond(FeelGood.Timeout)
+      }
+
+      Text("Are you Ok ?")
+      Text("$remain second to respond")
+      Button(onClick = { onRespond(FeelGood.Yes) }) { Text("Yes !") }
+      Button(onClick = { onRespond(FeelGood.No) }) { Text("No") }
+    }
+]
+]
+]
+.right-column[
+
+- si on a besoin d'un état qui va changer mais on ne veut pas relancer l'effet : `rememberUpdatedState`
+
+
+### DisposableEffect
+
+LaunchEffect avec une lambda appelée avant le `leave` :
+- `onDispose` 
+
+### SideEffect
+- Appelé à chaque recomposition
+- pour sauvegarder l'état
+
+### Peut être remplacé par un bon ViewModel
+
+]
+---
+### State custom
+
+.left-column[
+Créer un `State` à partir d'une `LiveData` : `LiveData.observeAsState()`
+
+ou à la main, pour agréger des états ou les transformer
+.remark-code.reduce[ Example:
+
+    @Composable
+    fun feelGoodWordingState(feelGood: FeelGood?): State<String> {
+      return produceState(initialValue = "", feelGood) {
+        value = when(feelGood) {
+          FeelGood.Yes -> "Happy you are Ok !"
+          FeelGood.No -> "So sorry :'("
+          FeelGood.Timeout -> "Still there ???"
+          null -> "No value"
+      }
+    }
+]
+]
+
+.right-column[
+ou plus simplement en utilsant `derivedStateOf`
+
+.remark-code[ Example:
+
+    val feelGoodWording by remember(feelGood) { derivedStateOf {
+      when(feelGood) {
+        FeelGood.Yes -> "Happy you are Ok !"
+        FeelGood.No -> "So sorry :'("
+        FeelGood.Timeout -> "Still there ???"
+        null -> "No value"
+      }
+    }
+]
+]
+
 
 ---
 ## Échafaud : Scaffold

@@ -29,7 +29,7 @@
 
 ### TP-5
 
-[Persistance with Room](https://codelabs.developers.google.com/codelabs/android-room-with-a-view-kotlin)
+[Persistance with Room](https://developer.android.com/courses/pathways/android-basics-compose-unit-6-pathway-2)
 
 ### TP-6
 

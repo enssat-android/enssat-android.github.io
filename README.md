@@ -17,23 +17,23 @@
 
 ### TP-2
 
-[L'état dans Jetpack Compose](https://developer.android.com/codelabs/jetpack-compose-state)
+[Mises en page de base dans Compose](https://developer.android.com/codelabs/jetpack-compose-layouts)
 
 ### TP-3
 
-[Mises en page de base dans Compose](https://developer.android.com/codelabs/jetpack-compose-layouts)
+[État avancé et effets secondaires dans Jetpack Compose](https://developer.android.com/codelabs/jetpack-compose-advanced-state-side-effects)
 
 ### TP-4
 
-[État avancé et effets secondaires dans Jetpack Compose](https://developer.android.com/codelabs/jetpack-compose-advanced-state-side-effects)
+[Créer des applications adaptatives avec Jetpack Compose](https://codelabs.developers.google.com/jetpack-compose-adaptability)
 
 ### TP-5
 
-[Persistance with Room](https://developer.android.com/courses/pathways/android-basics-compose-unit-6-pathway-2)
+[Persistance with Room](https://developer.android.com/codelabs/basic-android-kotlin-compose-persisting-data-room)
 
 ### TP-6
 
-[Background with Workmanager](https://codelabs.developers.google.com/codelabs/android-workmanager-kt)
+[Background with Workmanager](https://developer.android.com/codelabs/basic-android-kotlin-compose-workmanager)
 
 
 

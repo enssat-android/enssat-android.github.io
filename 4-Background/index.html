@@ -270,6 +270,36 @@ fun usage() {
   AppExecutor.networkIO.execute { requestData() }
 }
 ```
+---
+## Coroutines
+
+Légères, moins de fuites mémoires, intégrées à Jetpack
+
+
+```
+class ApiRepository() {
+  // note: suspend keyword disallow call this on the UI thread
+  suspend fun callApi(): Data {
+    // blocking call
+    return blockingRequest()
+  }
+}
+
+class MyViewModel(api: ApiRepository): VieWModel() {
+
+  private val _currentData = MutableLiveData<Data>()
+  val currentData: LiveData<Data> = _currentData
+
+  fun fetchData() {
+    // launch in a side thread, this in not blocking
+    viewModelScope.launch {
+      val data = api.callApi()
+      // update state with data
+      _currentData.post(data)
+    }
+  }
+}
+```
 
 
 ---

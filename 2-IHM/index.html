@@ -198,11 +198,8 @@ Coder une activité revient à coder les actions à faire quand le système stim
 
 ---
 ## Cycle de vie d'une activité
-
-### 
-
 <center>
-<img width="50%" src="img/activity_lifecycle.png" />
+<img width="40%" src="img/activity_lifecycle.png" />
 </center>
 
 
@@ -635,7 +632,7 @@ Très utile pour séparer définitivement l'UI des données
 ]
 
 .right-column[
-<img src="img/view-model.png" />
+<img src="img/viewmodel-lifecycle.png" />
 ]
 
 ---
@@ -706,12 +703,12 @@ template: inverse
     fun JetPackCompose() {
       Card {
         var expanded by remember { mutableStateOf(false) }
-        Column(modifier.clickable { expanded = !expanded }) {
-          Image(painterRessource(R.drawable.jetpack_compose))
-          AnimaterVisibility(expanded) {
+        Column(Modifier.clickable { expanded = !expanded }) {
+          Image(painterResource(R.drawable.jetpack_compose))
+          AnimatedVisibility(expanded) {
             Text(
               text = "Jetpack Compose",
-              style = MaterialTheme.typography.h2,
+              style = MaterialTheme.typography.headlineLarge,
             )
           }
         } 

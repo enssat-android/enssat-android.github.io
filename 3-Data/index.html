@@ -340,7 +340,6 @@ Android contient la librairie SQLite qui permet de gérer des bases de données
         // optional but if you're not sure about your upgrade it can be use full
         // modify the tables, revert changes of the onUpgrade
     }
-}
 ]
 
 ---
@@ -424,29 +423,25 @@ manipulation de la base de données.
 Le mapping entre les tables (SQL) et les objets (Java) va se faire automatiquement.
 
 ---
-
 ## Room
 
 .remark-code[entités
 
-@Entity
-    data class User(
+    @Entity data class User(
         @PrimaryKey val uid: Int,
         @ColumnInfo(name = "first_name") val firstName: String?,
         @ColumnInfo(name = "last_name") val lastName: String?
-    )]
+    )
+]
 .remark-code[DAO
 
     @Dao
     interface UserDao {
-        @Query("SELECT * FROM user")
-        fun getAll(): List<User>
+        @Query("SELECT * FROM user") fun getAll(): List<User>
 
-        @Insert
-        fun insertAll(vararg users: User)
+        @Insert fun insertAll(vararg users: User)
 
-        @Delete
-        fun delete(user: User)
+        @Delete fun delete(user: User)
     }]
 .remark-code[Database
 

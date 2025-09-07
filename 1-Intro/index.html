@@ -124,9 +124,9 @@ class: center, middle, inverse
 ---
 # Android Introduction
 
-ENSSAT 2024-2025
+ENSSAT 2025-2026
 
-Guillaume Châtelet - Pierre Crépieux - Gilles Le Brun
+Guillaume Châtelet - Pierre Crépieux
 
 ---
 layout:false
@@ -558,6 +558,7 @@ matériel.
 <tr><td>13 </td><td> Android 13 - T    </td><td>09/22 </td><td>33   </td></tr>
 <tr><td>14 </td><td> Android 14 - U    </td><td>09/23 </td><td>34   </td></tr>
 <tr><td>15 </td><td> Android 15 - V    </td><td>09/24 </td><td>35   </td></tr>
+<tr><td>16 </td><td> Android 16        </td><td>06/25 </td><td>36   </td></tr>
 </table>
 ]
 
@@ -589,13 +590,13 @@ fragmentation.
 Android Go : version pour device low-end
 
 ---
-## Repartition des versions ([May 2024](https://www.composables.com/tools/distribution-chart))
+## Repartition des versions ([Avril 2025](https://www.composables.com/tools/distribution-chart))
 
 # 
  
 
 <center>
-<img width="60%" src="img/chart-2024.png" />
+<img width="60%" src="img/chart-2025.png" />
 </center>
 
 ---
@@ -852,6 +853,27 @@ Très bonne intégration du SDK Android
 .center[https://developer.android.com/studio/index.html#downloads]
 
 ---
+## Kotlin 
+
+
+.left-column[
+- supporté par Google depuis 2017
+- préféré par Google depuis 2019
+
+Un code plus sûr, plus expresif et plus concis
+
+Des librairies kotlin first : par exemple Compose
+
+Pour commencer : 
+ - [kotlin basic syntax](https://kotlinlang.org/docs/basic-syntax.html)
+ - [kotlin idioms](https://kotlinlang.org/docs/idioms.html)
+ - [kotlin Koans](https://play.kotlinlang.org/koans/overview) pour apprendre kotlin en ligne
+]
+.right-column[
+<img width="80%" src="img/kotlin.png" />
+]
+
+---
 ## Gradle : script de build : plugin Android
 
 Gradle est un outil de build basé sur le langage Groovy
@@ -925,18 +947,12 @@ Mémoire, cpu, gpu, réseau :
 .green[N'oubliez pas que votre application tourne sur un téléphone]
 
 ---
-## Outil d'édition de layout  
- 
-Souvent fastidieux à la main, plus rapide pour créer les grande ligne
+## Outil de visualisation de layout  
 
-<img width="100%" src="img/studio/studio-android-layout-edit.png" />
+Compose preview
 
----
-## Outil d'édition de layout
-  
-Dans les faits, .green[on fini toujours par éditer le XML à la main]
+<center><img width="60%" src="img/studio/studio-android-compose-preview.png" /></center>
 
-<img width="100%" src="img/studio/studio-android-layout-XML.png" />
 
 ---
 ## Tests unitaire
